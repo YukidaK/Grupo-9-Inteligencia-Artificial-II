@@ -1,0 +1,8 @@
+__pycache__/
+.venv/
+dados/
+resultados/
+.env
+.env.*
+!.env.example
+cache_tmdb/

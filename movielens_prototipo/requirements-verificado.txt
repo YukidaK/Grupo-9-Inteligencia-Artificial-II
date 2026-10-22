@@ -1,0 +1,6 @@
+# Ambiente verificado: Python 3.12; instalação reproduzível.
+numpy==2.5.2
+pandas==3.0.5
+scipy==1.18.1
+python-dateutil==2.9.0.post0
+six==1.17.0

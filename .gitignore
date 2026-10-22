@@ -1,0 +1,67 @@
+.venv/
+__pycache__/
+.env
+.env.*
+!.env.example
+
+# Documento de trabalho local; assets e templates por extensão continuam permitidos
+/Documentacao_CineMatch_MovieLens.docx
+
+# Ambientes e artefatos Python
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.py[cod]
+
+# Credenciais e configuração privada local
+.aws/
+.codex/
+.agents/
+credentials.json
+secrets.json
+*.pem
+*.key
+
+# Dados baixados e derivados (fixtures fora destas pastas são permitidas)
+dados/
+resultados/
+cache_tmdb/
+ml-latest-small/
+ml-latest-small.zip
+resultados_movielens.zip
+
+# Estado local: não usar estas pastas para fixtures sintéticas
+logs/
+*.log
+sessoes/
+sessions/
+conversas/
+historicos/
+instance/
+local/
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+# Bancos .db somente em local/ ou instance/; fixtures .db são permitidas
+
+# Arquivos temporários, bloqueios e backups de editores
+~$*
+.~lock.*#
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Checkpoints locais do Jupyter
+.ipynb_checkpoints/
+
+# Metadados do sistema operacional
+.DS_Store
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,90 @@
+{
+  "generos_identificados": [
+    "Crime",
+    "Mystery",
+    "Thriller"
+  ],
+  "aviso": "Protótipo por palavras-chave: não interpreta negações, enredos ou preferências complexas. Não informa disponibilidade em plataformas.",
+  "recomendacoes": [
+    {
+      "movieId": 50,
+      "titulo": "Usual Suspects, The (1995)",
+      "generos": "Crime|Mystery|Thriller",
+      "nota_media_treino": 4.26,
+      "avaliacoes_treino": 170,
+      "motivo": "Gêneros relacionados ao pedido: Crime, Mystery, Thriller"
+    },
+    {
+      "movieId": 1252,
+      "titulo": "Chinatown (1974)",
+      "generos": "Crime|Film-Noir|Mystery|Thriller",
+      "nota_media_treino": 4.22,
+      "avaliacoes_treino": 51,
+      "motivo": "Gêneros relacionados ao pedido: Crime, Mystery, Thriller"
+    },
+    {
+      "movieId": 1089,
+      "titulo": "Reservoir Dogs (1992)",
+      "generos": "Crime|Mystery|Thriller",
+      "nota_media_treino": 4.16,
+      "avaliacoes_treino": 106,
+      "motivo": "Gêneros relacionados ao pedido: Crime, Mystery, Thriller"
+    },
+    {
+      "movieId": 31364,
+      "titulo": "Memories of Murder (Salinui chueok) (2003)",
+      "generos": "Crime|Drama|Mystery|Thriller",
+      "nota_media_treino": 4.7,
+      "avaliacoes_treino": 5,
+      "motivo": "Gêneros relacionados ao pedido: Crime, Mystery, Thriller"
+    },
+    {
+      "movieId": 38061,
+      "titulo": "Kiss Kiss Bang Bang (2005)",
+      "generos": "Comedy|Crime|Mystery|Thriller",
+      "nota_media_treino": 4.19,
+      "avaliacoes_treino": 24,
+      "motivo": "Gêneros relacionados ao pedido: Crime, Mystery, Thriller"
+    },
+    {
+      "movieId": 933,
+      "titulo": "To Catch a Thief (1955)",
+      "generos": "Crime|Mystery|Romance|Thriller",
+      "nota_media_treino": 4.16,
+      "avaliacoes_treino": 19,
+      "motivo": "Gêneros relacionados ao pedido: Crime, Mystery, Thriller"
+    },
+    {
+      "movieId": 1086,
+      "titulo": "Dial M for Murder (1954)",
+      "generos": "Crime|Mystery|Thriller",
+      "nota_media_treino": 4.14,
+      "avaliacoes_treino": 21,
+      "motivo": "Gêneros relacionados ao pedido: Crime, Mystery, Thriller"
+    },
+    {
+      "movieId": 79132,
+      "titulo": "Inception (2010)",
+      "generos": "Action|Crime|Drama|Mystery|Sci-Fi|Thriller|IMAX",
+      "nota_media_treino": 4.03,
+      "avaliacoes_treino": 122,
+      "motivo": "Gêneros relacionados ao pedido: Crime, Mystery, Thriller"
+    },
+    {
+      "movieId": 1617,
+      "titulo": "L.A. Confidential (1997)",
+      "generos": "Crime|Film-Noir|Mystery|Thriller",
+      "nota_media_treino": 4.02,
+      "avaliacoes_treino": 78,
+      "motivo": "Gêneros relacionados ao pedido: Crime, Mystery, Thriller"
+    },
+    {
+      "movieId": 71033,
+      "titulo": "Secret in Their Eyes, The (El secreto de sus ojos) (2009)",
+      "generos": "Crime|Drama|Mystery|Romance|Thriller",
+      "nota_media_treino": 4.4,
+      "avaliacoes_treino": 5,
+      "motivo": "Gêneros relacionados ao pedido: Crime, Mystery, Thriller"
+    }
+  ]
+}
