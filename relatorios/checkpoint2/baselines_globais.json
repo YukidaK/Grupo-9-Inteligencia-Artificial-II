@@ -1,0 +1,38 @@
+{
+  "metricas": {
+    "nota_ponderada": {
+      "precision_at_10": 0.058151260504201684,
+      "recall_at_10": 0.04462883992376285,
+      "ndcg_at_10": 0.08311821119683549
+    },
+    "popularidade": {
+      "precision_at_10": 0.11781512605042019,
+      "recall_at_10": 0.09489094770450635,
+      "ndcg_at_10": 0.15817314572625046
+    }
+  },
+  "usuarios_avaliados": 595,
+  "usuarios_sem_relevantes_excluidos": 15,
+  "relevantes_teste": 9607,
+  "relevantes_elegiveis": 8520,
+  "protocolo": "Todos os itens elegíveis, sem amostragem de negativos. Itens relevantes fora do catálogo contam como não recuperados. Precision divide por 10 mesmo quando há menos resultados. Notas >=4 são relevantes.",
+  "auditoria": {
+    "ratings_entrada": 100836,
+    "ratings_limpos": 100836,
+    "ratings_removidos": 0,
+    "filmes_catalogo": 9742
+  },
+  "seed": 42,
+  "fracao_teste": 0.2,
+  "min_avaliacoes_filme_treino": 5,
+  "min_avaliacoes_usuario_treino": 5,
+  "linhas_treino": 80896,
+  "linhas_teste": 19940,
+  "itens_elegiveis": 3218,
+  "matriz_shape": [
+    610,
+    8960
+  ],
+  "matriz_esparsidade": 0.9851990632318501,
+  "observacao": "Métricas avaliam baselines por histórico; não avaliam compreensão de texto. A matriz mantém todas as avaliações dos usuários elegíveis; o corte por filme define o catálogo dos baselines."
+}

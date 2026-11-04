@@ -1,0 +1,138 @@
+{
+  "versao": 1,
+  "status": "preparação local; aprovação de publicação pendente",
+  "arquivos": [
+    {
+      "arquivo": "reproducao/historico_20261029/avaliacao_interna.py",
+      "origem_local_relativa": "verificacoes/item_item_20261029/codigo/avaliacao_interna.py",
+      "sha256": "2dbd6b0a7e51800fff0b1f30a8811f04179bd85141143b36a8513094da1d5705",
+      "tipo": "fonte histórica conferida com manifesto item–item"
+    },
+    {
+      "arquivo": "reproducao/historico_20261029/avaliacao_perfil.py",
+      "origem_local_relativa": "verificacoes/item_item_20261029/codigo/avaliacao_perfil.py",
+      "sha256": "a1a924964f0193c69e4541ec1579bc4ceabc255167689176ea0b4dc599867d03",
+      "tipo": "fonte histórica conferida com manifesto item–item"
+    },
+    {
+      "arquivo": "reproducao/historico_20261029/divisao_interna.py",
+      "origem_local_relativa": "verificacoes/item_item_20261029/codigo/divisao_interna.py",
+      "sha256": "0fec8e0edf94cc3f5e88fd60dec495230c46ae69d34d880e1f1215e03d10aa77",
+      "tipo": "fonte histórica conferida com manifesto item–item"
+    },
+    {
+      "arquivo": "reproducao/historico_20261029/recomendador.py",
+      "origem_local_relativa": "verificacoes/item_item_20261029/codigo/recomendador.py",
+      "sha256": "67bf26fa98906611a508120723bdeadf6820c0f5b98beb95755fb3263fb13bf4",
+      "tipo": "fonte histórica conferida com manifesto item–item"
+    },
+    {
+      "arquivo": "reproducao/historico_20261029/conversa.py",
+      "origem_local_relativa": "verificacoes/item_item_20261029/codigo/conversa.py",
+      "sha256": "ca40cb52f7dd1f41af605bb18ada6ff5d3023ea57ebb9f83225bb672881b385f",
+      "tipo": "fonte histórica conferida com manifesto item–item"
+    },
+    {
+      "arquivo": "reproducao/historico_20261029/identidades.py",
+      "origem_local_relativa": "verificacoes/item_item_20261029/codigo/identidades.py",
+      "sha256": "334d6a588951686acb3881792239886e61b7552bdd9392000e335d79fdb55f98",
+      "tipo": "fonte histórica conferida com manifesto item–item"
+    },
+    {
+      "arquivo": "reproducao/historico_20261029/artefatos_resultados.py",
+      "origem_local_relativa": "verificacoes/item_item_20261029/codigo/artefatos_resultados.py",
+      "sha256": "5bff9018063d331fc0f3bee01a920a4ddb70d2eaa33fe7ddb158b8236a9caf68",
+      "tipo": "fonte histórica conferida com manifesto item–item"
+    },
+    {
+      "arquivo": "reproducao/historico_20261029/item_item_experimental.py",
+      "origem_local_relativa": "verificacoes/item_item_20261029/codigo/item_item_experimental.py",
+      "sha256": "f58a4bc4bfeb42a04df24ac52f0e32a92183058a3856a404aaec4fc53042728f",
+      "tipo": "fonte histórica conferida com manifesto item–item"
+    },
+    {
+      "arquivo": "reproducao/historico_20261029/experimento_item_item.py",
+      "origem_local_relativa": "verificacoes/item_item_20261029/codigo/experimento_item_item.py",
+      "sha256": "d38e31f8f603009dcd7a0d108057a2c98b0a0ab54438e0dc79aad25281ab1d27",
+      "tipo": "fonte histórica conferida com manifesto item–item"
+    },
+    {
+      "arquivo": "reproducao/historico_20261029/carregamento_movielens.py",
+      "origem_local_relativa": "verificacoes/avaliacao_perfil_20261028/codigo/carregamento_movielens.py",
+      "sha256": "3d96638cdb56d9c2dfbeade0170769bc9116f800ecbb45371051e93d3b981b69",
+      "tipo": "dependência histórica preservada em evidência; fora da lista de código do manifesto item–item"
+    },
+    {
+      "arquivo": "reproducao/referencias/avaliacao_perfil/manifesto.json",
+      "origem_local_relativa": "experimentos/avaliacao_perfil_20261028/manifesto.json",
+      "sha256": "ac17a4b7f1f1b387910f01c175a30796456b647ad18a948f6a684a7fc4a4bd83",
+      "tipo": "referência histórica; não contém os artefatos individuais referenciados"
+    },
+    {
+      "arquivo": "relatorios/checkpoint2/avaliacao_perfil/resumo.csv",
+      "origem_local_relativa": "experimentos/avaliacao_perfil_20261028/resumo.csv",
+      "sha256": "9b12c4f017f8a6b980e38e21846d6dc92eb50ce8719f060c7b7caba28e6883ba",
+      "tipo": "métricas agregadas originais, sem recálculo"
+    },
+    {
+      "arquivo": "relatorios/checkpoint2/avaliacao_perfil/resumo.json",
+      "origem_local_relativa": "experimentos/avaliacao_perfil_20261028/resumo.json",
+      "sha256": "134375bf9b6bb9be4b5b039f33b561de11d59c528be49f059d65fa429e578c16",
+      "tipo": "métricas agregadas originais, sem recálculo"
+    },
+    {
+      "arquivo": "reproducao/referencias/divisao_interna_final/manifesto.json",
+      "origem_local_relativa": "experimentos/divisao_interna_20261029_final/manifesto.json",
+      "sha256": "163895b2074829aaad32aca247420dd36a41cf879ac0b9fc77f2df19d6475c57",
+      "tipo": "referência histórica; não contém os artefatos individuais referenciados"
+    },
+    {
+      "arquivo": "reproducao/referencias/avaliacao_interna/manifesto.json",
+      "origem_local_relativa": "experimentos/avaliacao_interna_20261029/manifesto.json",
+      "sha256": "3a7050e6af5dfa41df8415e5efa3b8adf69d46ccb74c8d856acfff5f8892a9e1",
+      "tipo": "referência histórica; não contém os artefatos individuais referenciados"
+    },
+    {
+      "arquivo": "relatorios/checkpoint2/avaliacao_interna/resumo.csv",
+      "origem_local_relativa": "experimentos/avaliacao_interna_20261029/resumo.csv",
+      "sha256": "a311a5a70744f7bb2e2f4de20e74d36108e429bf381d97391f798e740cf9ef81",
+      "tipo": "métricas agregadas originais, sem recálculo"
+    },
+    {
+      "arquivo": "relatorios/checkpoint2/avaliacao_interna/resumo.json",
+      "origem_local_relativa": "experimentos/avaliacao_interna_20261029/resumo.json",
+      "sha256": "33d6d5739cb1f404e58fc8f0a94a18a7dcbf61241534cfa579fa51022e9943fa",
+      "tipo": "métricas agregadas originais, sem recálculo"
+    },
+    {
+      "arquivo": "reproducao/referencias/item_item/manifesto.json",
+      "origem_local_relativa": "experimentos/item_item_20261029/manifesto.json",
+      "sha256": "5c83203d5a53784ae881154eeba960bac6fce61c36b2f9268e7769ef3a0853f4",
+      "tipo": "referência histórica; não contém os artefatos individuais referenciados"
+    },
+    {
+      "arquivo": "relatorios/checkpoint2/item_item/resumo.csv",
+      "origem_local_relativa": "experimentos/item_item_20261029/resumo.csv",
+      "sha256": "be636a7074f358e4ad770c0b2677b3495e714724576cd31ec497a881fa570ac5",
+      "tipo": "métricas agregadas originais, sem recálculo"
+    },
+    {
+      "arquivo": "relatorios/checkpoint2/item_item/resumo.json",
+      "origem_local_relativa": "experimentos/item_item_20261029/resumo.json",
+      "sha256": "070e5d11823abcf5cd282ee897f8c994335f4a8d9a07eea8ec580b3d56d20da2",
+      "tipo": "métricas agregadas originais, sem recálculo"
+    },
+    {
+      "arquivo": "reproducao/configuracao_item_item.json",
+      "origem_local_relativa": "experimentos/item_item_20261029/configuracao_previa.json",
+      "sha256": "f4e6598ef7a36ff5b6e32dbccd3713ebbb7627f4334fa804f3afc0ff11a403ef",
+      "tipo": "configuração original registrada, não hipótese retrospectiva"
+    },
+    {
+      "arquivo": "relatorios/checkpoint2/baselines_globais.json",
+      "origem_local_relativa": "movielens_prototipo/resultados/relatorio.json",
+      "sha256": "99627f0f139ed4f7124b1e7b3e3bbe0a27bf12d87170b910a729a1708a8e3576",
+      "tipo": "relatório agregado dos baselines originais"
+    }
+  ]
+}

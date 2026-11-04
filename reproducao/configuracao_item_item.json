@@ -1,0 +1,28 @@
+{
+  "registrado_em": "2026-10-29T23:12:16.830809+00:00",
+  "algoritmo": "cosseno ajustado em coavaliadores; shrinkage; somente similaridades positivas",
+  "min_filme": 5,
+  "min_coavaliadores": 5,
+  "shrinkage": 10,
+  "bloco_itens": 128,
+  "score": "soma das similaridades positivas às referências dividida por número total de referências ativas",
+  "desempate": "score decrescente, movieId crescente",
+  "fallback": null,
+  "centragem": "média por usuário sobre todas as notas observadas de desenvolvimento antes do corte de filmes",
+  "normas": "somente usuários que avaliaram os dois itens",
+  "top_vizinhos": "todos os pares com suporte, norma válida e similaridade positiva",
+  "seed_referencias": 201,
+  "referencias": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "coorte": 594,
+  "relevante": 4,
+  "k": 10,
+  "candidatos": "mesmos da avaliação interna aprovada incluindo filtro de gêneros",
+  "controles": "reutilizar listas aprovadas, conferir manifesto, partições, catálogo, parâmetros e código; recalcular métricas após listas CF",
+  "decisao_sem_consultar_validacao": true
+}

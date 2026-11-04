@@ -65,3 +65,19 @@ local/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Execuções e evidências brutas permanecem locais
+/experimentos/
+/verificacoes/
+
+# Ferramentas opcionais e cobertura
+node_modules/
+coverage/
+htmlcov/
+.coverage
+.coverage.*
+
+# Arquivos históricos preservados localmente; permanecem nos commits antigos
+/movielens_prototipo/Entrega_Matheus_MovieLens.ipynb
+/movielens_prototipo/EXEMPLO_SAIDA.json
+/movielens_prototipo/RELATORIO_VERIFICACAO.md

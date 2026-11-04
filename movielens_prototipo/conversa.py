@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 import re
 from recomendador import normalizar, interpretar
+from preferencias_streaming import PreferenciasStreaming
 
 
 @dataclass
@@ -13,6 +14,18 @@ class Sessao:
     negativos: set = field(default_factory=set)
     recomendacoes: list = field(default_factory=list)
     pendentes: set = field(default_factory=set)
+    streaming: PreferenciasStreaming | None = None
+
+    def configurar_streaming(self,preferencias,*,provedores_permitidos,regiao_catalogo):
+        """Somente contrato interno RF-02C; nenhuma ação HTTP o chama."""
+        if not isinstance(preferencias,PreferenciasStreaming):
+            raise ValueError('Informe preferências de streaming válidas.')
+        if (not isinstance(provedores_permitidos,frozenset)
+                or any(type(i) is not int or i<=0 for i in provedores_permitidos)
+                or regiao_catalogo!=preferencias.regiao
+                or not preferencias.provedores<=provedores_permitidos):
+            raise ValueError('Provedores incompatíveis com o catálogo da região.')
+        self.streaming = preferencias
 
 
 def interpretar_mensagem(texto):
@@ -74,6 +87,17 @@ class Conversa:
         return [self.filme(i) for i in achados.sort_values(['title', 'movieId']).index[:30]]
 
     def resposta(self, s, mensagem):
+        quantidade = len(s.referencias)
+        if quantidade == 0:
+            # Também protege respostas de estado/busca/comandos desconhecidos
+            # contra listas em cache quando não há mais referências ativas.
+            s.recomendacoes = []
+            mensagem += ' Selecione pelo menos um filme como referência ativa para receber recomendações.'
+        elif quantidade <= 2:
+            rotulo = 'referência ativa' if quantidade == 1 else 'referências ativas'
+            mensagem += (f' Com {quantidade} {rotulo}, o perfil pode ficar abrangente.'
+                         ' Fornecer mais filmes, até cinco referências, pode ajudar a identificar'
+                         ' melhor suas preferências, sem garantir maior precisão.')
         return {'mensagem': mensagem, 'assistidos': [self.filme(i) for i in s.assistidos],
                 'referencias': [self.filme(i) for i in s.referencias],
                 'excedentes': [self.filme(i) for i in s.assistidos if i not in s.referencias and i not in s.rejeitados],
@@ -83,6 +107,8 @@ class Conversa:
 
     def atualizar(self, s):
         s.recomendacoes = self.modelo.recomendar_perfil(s)
+        if not s.referencias:
+            return ''  # resposta() fornece a orientação, sem alegar falta de candidatos.
         return (' Há apenas ' + str(len(s.recomendacoes)) + ' candidatos adequados; mantive suas restrições.') if len(s.recomendacoes) < 10 else ''
 
     def considerar(self, s, movie_id, substituir=None):
@@ -92,7 +118,7 @@ class Conversa:
             raise ValueError('Esse filme foi rejeitado. Ele permanece apenas no histórico.')
         if movie_id in s.referencias:
             return 'Esse filme já é uma referência ativa.'
-        if len(s.referencias) == 5:
+        if len(s.referencias) >= 5:
             if substituir not in s.referencias:
                 return 'Escolha no controle de referências qual dos cinco filmes substituir.'
             s.referencias[s.referencias.index(substituir)] = movie_id
@@ -104,7 +130,7 @@ class Conversa:
         acao = dados.get('acao', 'mensagem')
         if acao == 'reiniciar':
             s.__dict__.update(Sessao().__dict__)
-            return self.resposta(s, 'Quais filmes você já assistiu? Busque e confirme pelo menos um título. O ideal é de 2 a 5.')
+            return self.resposta(s, 'Quais filmes você já assistiu? Busque e confirme de 1 a 5 referências.')
         if acao == 'estado':
             return self.resposta(s, 'Quais filmes você já assistiu? Busque os títulos e confirme a seleção.' if not s.assistidos else 'Sua sessão foi mantida.')
         if acao == 'buscar':
@@ -131,13 +157,21 @@ class Conversa:
                         s.referencias.append(i)
             s.pendentes.clear()
             msg = 'Filmes confirmados. Os títulos são referências provisórias, sem presumir que você gostou. Você pode dizer “assisti TÍTULO, mas não gostei”.' if inicial else 'Histórico atualizado. Os novos filmes preencheram as referências disponíveis, até cinco; os demais podem ser considerados pelos controles.'
-            if len(s.referencias) == 1:
-                msg += ' Uma referência deixa o perfil abrangente; informar outro filme pode melhorar as sugestões.'
             if len(s.assistidos) > 5:
-                msg += ' Usei inicialmente até cinco referências. Os demais estão em “Assistidos fora do perfil”, também excluídos das sugestões; você pode considerar um deles.'
+                msg += (' Os filmes usados estão em “Referências ativas”. Os demais não rejeitados'
+                        ' estão em “Assistidos fora do perfil”, apenas no histórico e também'
+                        ' excluídos das sugestões; você pode considerar um deles.')
             return self.resposta(s, msg + self.atualizar(s))
         if acao == 'considerar':
             return self.resposta(s, self.considerar(s, dados.get('movieId'), dados.get('substituir')))
+        if acao == 'remover_referencia':
+            i = dados.get('movieId')
+            if type(i) is not int or i not in s.referencias:
+                raise ValueError('Selecione uma referência ativa para remover.')
+            s.referencias.remove(i)
+            return self.resposta(s, 'Retirei ' + self.filme(i)['titulo']
+                + ' das referências ativas. O filme continua no histórico, sem registrar “não gostei”.'
+                + ' Você pode considerá-lo novamente.' + self.atualizar(s))
         if acao == 'rejeitar':
             i = dados.get('movieId')
             if type(i) is not int or i not in self.filmes.index:
@@ -147,7 +181,7 @@ class Conversa:
             s.rejeitados.add(i)
             if i in s.referencias:
                 s.referencias.remove(i)
-            return self.resposta(s, 'Retirei o filme das referências. Ele continua no histórico e não será recomendado.' + self.atualizar(s))
+            return self.resposta(s, 'Registrei que você não gostou do filme. Ele saiu das referências, continua no histórico e não será recomendado.' + self.atualizar(s))
         if acao != 'mensagem':
             raise ValueError('Ação desconhecida.')
         texto = dados.get('texto', '')

@@ -1,0 +1,133 @@
+{
+  "esquema": "cinematch.experimento.avaliacao_interna",
+  "versao_esquema": 1,
+  "execucao_id": "075c8f35-ed0f-4a6a-9bad-0c6d59ced161",
+  "criado_em": "2026-10-29T22:57:22.530554+00:00",
+  "dataset": {
+    "nome": "MovieLens Latest Small",
+    "versao": "2018-09-26",
+    "fonte": "arquivos locais verificados"
+  },
+  "divisao_execucao_id": "20e81ee2-5f1d-4a33-bf55-a4cf6436960f",
+  "entradas": {
+    "divisao/desenvolvimento.csv": {
+      "sha256": "bf6b2dee6dde76d90d31926e59430b24db9cd4047bd126f7d8c6872663371927",
+      "bytes": 1535118
+    },
+    "divisao/validacao.csv": {
+      "sha256": "5c75a2ac3974bd959cf061cdd1c925fb1b58f47e0dee3fec0e4c6d1fd2c5b5b3",
+      "bytes": 376616
+    },
+    "divisao/auditoria.json": {
+      "sha256": "41638b52c0a201ee079527fbbe31888abf28993b45fb85145ca3508969600baf",
+      "bytes": 618
+    },
+    "divisao/manifesto.json": {
+      "sha256": "163895b2074829aaad32aca247420dd36a41cf879ac0b9fc77f2df19d6475c57",
+      "bytes": 3195
+    },
+    "treino_origem": {
+      "sha256": "f4bfeae36b20990f5612be5ca36551ead9921a1fc9467c1484503530802850e0",
+      "bytes": 1911702
+    },
+    "manifesto_procedencia": {
+      "sha256": "ac17a4b7f1f1b387910f01c175a30796456b647ad18a948f6a684a7fc4a4bd83",
+      "bytes": 3667
+    },
+    "catalogo": {
+      "sha256": "89eb269977c4355bcd63820e2ec361a99bc5f09b75e3323578820df736c3a18f",
+      "bytes": 533350
+    }
+  },
+  "codigo": {
+    "avaliacao_interna.py": {
+      "sha256": "2dbd6b0a7e51800fff0b1f30a8811f04179bd85141143b36a8513094da1d5705",
+      "bytes": 10097
+    },
+    "avaliacao_perfil.py": {
+      "sha256": "a1a924964f0193c69e4541ec1579bc4ceabc255167689176ea0b4dc599867d03",
+      "bytes": 14960
+    },
+    "divisao_interna.py": {
+      "sha256": "0fec8e0edf94cc3f5e88fd60dec495230c46ae69d34d880e1f1215e03d10aa77",
+      "bytes": 14843
+    },
+    "recomendador.py": {
+      "sha256": "67bf26fa98906611a508120723bdeadf6820c0f5b98beb95755fb3263fb13bf4",
+      "bytes": 16034
+    },
+    "conversa.py": {
+      "sha256": "ca40cb52f7dd1f41af605bb18ada6ff5d3023ea57ebb9f83225bb672881b385f",
+      "bytes": 12247
+    },
+    "identidades.py": {
+      "sha256": "334d6a588951686acb3881792239886e61b7552bdd9392000e335d79fdb55f98",
+      "bytes": 3121
+    },
+    "artefatos_resultados.py": {
+      "sha256": "5bff9018063d331fc0f3bee01a920a4ddb70d2eaa33fe7ddb158b8236a9caf68",
+      "bytes": 10166
+    }
+  },
+  "parametros": {
+    "seed_divisao": 101,
+    "fracao_validacao": 0.2,
+    "seed_referencias": 201,
+    "referencias": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "min_usuario": 5,
+    "min_filme": 5,
+    "k": 10,
+    "relevante": 4.0,
+    "coorte": "fixa: pelo menos cinco positivos de desenvolvimento",
+    "historico_excluido": "todo o desenvolvimento individual",
+    "candidatos": "suporte >=5 em desenvolvimento; não vistos; interseção de gêneros com referências >0",
+    "preferencias_explicitas": "vazias",
+    "metodos": [
+      "popularidade",
+      "nota_ponderada",
+      "perfil"
+    ]
+  },
+  "ambiente": {
+    "python": "3.12.3",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1"
+  },
+  "arquivos": {
+    "listas.csv": {
+      "sha256": "fa4f48acfff66f890381516dbaccad8f9f534e10f1d9c3a6549ce381bef9c06a",
+      "bytes": 1722124
+    },
+    "estatisticas_desenvolvimento.csv": {
+      "sha256": "d4b279ce54d460518c79a7e8b52aaadc7daabdad4f03d558fd59d8ca175e54f4",
+      "bytes": 111548
+    },
+    "avaliacao_por_usuario.csv": {
+      "sha256": "3793a1992f1b296da2e1c8d7adf13d18ae0f21ec061754cb715eedc8dc028a87",
+      "bytes": 1971276
+    },
+    "resumo.csv": {
+      "sha256": "a311a5a70744f7bb2e2f4de20e74d36108e429bf381d97391f798e740cf9ef81",
+      "bytes": 2518
+    },
+    "resumo.json": {
+      "sha256": "33d6d5739cb1f404e58fc8f0a94a18a7dcbf61241534cfa579fa51022e9943fa",
+      "bytes": 9197
+    },
+    "usuarios.csv": {
+      "sha256": "696aef054a32705c2613dd5e8aa5492f76158abe5bc0cf1f3b1f6a8267d04cb7",
+      "bytes": 6710
+    },
+    "auditoria.json": {
+      "sha256": "dee10c03cf8a8a13d256b9c77522f58ec029a51c14b8a0ffa51f14c814ee1fe2",
+      "bytes": 1454
+    }
+  }
+}

@@ -6,3 +6,8 @@ resultados/
 .env.*
 !.env.example
 cache_tmdb/
+
+# Saídas temporárias locais e checkpoints de notebook
+.ipynb_checkpoints/
+*.tmp
+*.log

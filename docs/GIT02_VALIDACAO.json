@@ -1,0 +1,53 @@
+{
+  "atividade": "GIT-02",
+  "data": "2026-11-03",
+  "natureza": "validação local de leitura; sem execução de experimentos ou suítes funcionais",
+  "arquivos_anteriores_conferidos": 654,
+  "arquivos_anteriores_ausentes": [],
+  "arquivos_anteriores_alterados_nesta_etapa": [
+    ".gitignore",
+    "movielens_prototipo/.gitignore",
+    "movielens_prototipo/PROTECAO_POSTERES.md",
+    "movielens_prototipo/README.md",
+    "movielens_prototipo/STREAMING_WEB.md"
+  ],
+  "demais_arquivos_anteriores_identicos": 649,
+  "grupos_integros_por_sha256": {
+    "movielens_prototipo/dados/": 7,
+    "movielens_prototipo/resultados/": 8,
+    "experimentos/": 32,
+    "verificacoes/": 487,
+    ".git/": 51
+  },
+  "copias_exatas_selecionadas": 22,
+  "modulos_historicos_atestados_no_manifesto": 9,
+  "dependencias_externas_resolvidas_por_ast": {
+    "movielens_prototipo": [
+      "numpy",
+      "pandas",
+      "scipy"
+    ],
+    "reproducao/historico_20261029": [
+      "numpy",
+      "pandas",
+      "scipy"
+    ]
+  },
+  "notebook_celulas": 15,
+  "notebook_saidas": 0,
+  "links_markdown_locais_validados": 49,
+  "candidatos_staging": 96,
+  "candidatos_ignorados": 0,
+  "achados_padroes_fortes_na_selecao": [],
+  "git_diff_check": "aprovado",
+  "staging_vazio": true,
+  "arquivos_rastreados": 22,
+  "git_status_modificados": 13,
+  "git_status_nao_rastreados": 77,
+  "pendencias": [
+    "licença de código",
+    "privacidade do e-mail histórico e arquivos já rastreados sob revisão",
+    "aprovação da seleção e da visibilidade",
+    "reexecução histórica completa não realizada"
+  ]
+}

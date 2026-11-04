@@ -1,21 +1,21 @@
 """Preparação, avaliação e recomendação. Python >=3.10; sem API externa."""
 from pathlib import Path
 import argparse
-import hashlib
-import io
 import json
 import re
 import unicodedata
-import urllib.request
-import urllib.error
-import ssl
-import zipfile
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix, save_npz
 
+from carregamento_movielens import URL_MOVIELENS as URL, carregar_movielens
+from artefatos_resultados import (
+    MANIFESTO, PENDENTE, ErroArtefatos, identidade_dataset,
+    iniciar_identificacao, gravar_manifesto, validar_resultados,
+)
+from identidades import conteudo_movielens, usuario_movielens
+
 ROOT = Path(__file__).resolve().parent
-URL = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
 SEED = 42
 
 def normalizar(texto):
@@ -49,30 +49,8 @@ def interpretar(texto):
     return [g for g, palavras in VOCAB.items() if any(re.search(r'\b' + re.escape(p) + r'\b', t) for p in palavras)]
 
 def carregar(pasta=None):
-    pasta = Path(pasta) if pasta else ROOT / 'dados' / 'ml-latest-small'
-    if not all((pasta / f).exists() for f in ['ratings.csv', 'movies.csv']):
-        pasta.parent.mkdir(parents=True, exist_ok=True)
-        zip_local = pasta.parent / 'ml-latest-small.zip'
-        if zip_local.is_file():
-            print('Usando ZIP local: ' + str(zip_local), flush=True)
-            arquivo = zip_local.read_bytes()
-        else:
-            print('Baixando MovieLens oficial...', flush=True)
-            try:
-                with urllib.request.urlopen(URL, timeout=60) as resposta:
-                    arquivo = resposta.read()
-            except urllib.error.URLError as erro:
-                certificado = isinstance(erro.reason, ssl.SSLCertVerificationError)
-                motivo = 'O Python não conseguiu validar o certificado HTTPS.' if certificado else 'Não foi possível baixar o MovieLens: ' + str(erro.reason)
-                raise RuntimeError(motivo + '\nBaixe ' + URL + ' pelo navegador e salve em ' + str(zip_local) + '\nDepois execute o aplicativo novamente. Também pode extrair ratings.csv e movies.csv em ' + str(pasta) + '.') from erro
-        # Salva a origem e o hash para identificar a versão usada no experimento.
-        (pasta.parent / 'origem.json').write_text(json.dumps({'url': URL, 'arquivo_local': str(zip_local) if zip_local.is_file() else None, 'sha256_zip': hashlib.sha256(arquivo).hexdigest()}, indent=2))
-        with zipfile.ZipFile(io.BytesIO(arquivo)) as z:
-            for nome in ['ratings.csv', 'movies.csv', 'tags.csv', 'links.csv', 'README.txt']:
-                membro = 'ml-latest-small/' + nome
-                pasta.mkdir(parents=True, exist_ok=True)
-                (pasta / nome).write_bytes(z.read(membro))
-    return pd.read_csv(pasta / 'ratings.csv'), pd.read_csv(pasta / 'movies.csv')
+    """Entrada compatível; delega somente a leitura/aquisição do MovieLens."""
+    return carregar_movielens(pasta, raiz=ROOT, url=URL)
 
 def limpar(ratings, movies):
     r, m = ratings.copy(), movies.copy()
@@ -135,7 +113,17 @@ def avaliar(treino, teste, stats, k=10, relevante=4.):
     base=df[df.metodo=='popularidade']
     return df, {'metricas':metricas,'usuarios_avaliados':len(base),'usuarios_sem_relevantes_excluidos':int(teste.userId.nunique()-len(base)),'relevantes_teste':int(base.relevantes_teste.sum()),'relevantes_elegiveis':int(base.relevantes_elegiveis.sum()),'protocolo':'Todos os itens elegíveis, sem amostragem de negativos. Itens relevantes fora do catálogo contam como não recuperados. Precision divide por 10 mesmo quando há menos resultados. Notas >=4 são relevantes.'}
 
-def preparar(pasta=None, min_filme=5, min_usuario=5):
+def preparar(pasta=None, min_filme=5, min_usuario=5, *, diretorio_resultados=None,
+             identificar=False, dataset=None):
+    saida = Path(diretorio_resultados) if diretorio_resultados is not None else ROOT/'resultados'
+    if identificar:
+        identidade = identidade_dataset(dataset, URL)
+        execucao = iniciar_identificacao(saida)
+    else:
+        if dataset is not None:
+            raise ValueError('Metadados do dataset exigem identificar=True.')
+        if (saida / MANIFESTO).exists() or (saida / PENDENTE).exists():
+            raise ErroArtefatos('Não é permitido sobrescrever resultados identificados: ' + str(saida))
     bruto,m=carregar(pasta)
     r,m,auditoria=limpar(bruto,m)
     treino_bruto,teste=dividir(r)
@@ -145,7 +133,7 @@ def preparar(pasta=None, min_filme=5, min_usuario=5):
     treino=treino_bruto[treino_bruto.userId.isin(usuarios)].copy()
     teste=teste[teste.userId.isin(usuarios)].copy()
     stats=ranking(treino,min_filme)
-    saida=ROOT/'resultados'; saida.mkdir(exist_ok=True)
+    saida.mkdir(parents=diretorio_resultados is not None, exist_ok=True)
     treino.to_csv(saida/'treino.csv',index=False); teste.to_csv(saida/'teste.csv',index=False)
     m.to_csv(saida/'filmes.csv',index=False); stats.to_csv(saida/'ranking_treino.csv',index=False)
     users=sorted(treino.userId.unique()); itens=sorted(treino.movieId.unique())
@@ -157,6 +145,14 @@ def preparar(pasta=None, min_filme=5, min_usuario=5):
     detalhes.to_csv(saida/'metricas_por_usuario.csv',index=False)
     resumo.update({'auditoria':auditoria,'seed':SEED,'fracao_teste':.2,'min_avaliacoes_filme_treino':min_filme,'min_avaliacoes_usuario_treino':min_usuario,'linhas_treino':len(treino),'linhas_teste':len(teste),'itens_elegiveis':len(stats),'matriz_shape':list(matriz.shape),'matriz_esparsidade':1-matriz.nnz/(matriz.shape[0]*matriz.shape[1]),'observacao':'Métricas avaliam baselines por histórico; não avaliam compreensão de texto. A matriz mantém todas as avaliações dos usuários elegíveis; o corte por filme define o catálogo dos baselines.'})
     (saida/'relatorio.json').write_text(json.dumps(resumo,ensure_ascii=False,indent=2))
+    if identificar:
+        origem = Path(pasta) if pasta else ROOT/'dados/ml-latest-small'
+        parametros = {chave: resumo[chave] for chave in (
+            'seed', 'fracao_teste', 'min_avaliacoes_filme_treino',
+            'min_avaliacoes_usuario_treino')}
+        parametros.update({'k': 10, 'relevante': 4.})
+        gravar_manifesto(saida, execucao, identidade, parametros,
+                         {nome: origem / nome for nome in ('ratings.csv', 'movies.csv')})
     print(json.dumps(resumo,ensure_ascii=False,indent=2))
     return treino,teste,m,stats
 
@@ -167,6 +163,16 @@ class Recomendador:
             self.filmes['ano'] = pd.to_numeric(self.filmes.title.str.extract(r'\((\d{4})\)\s*$', expand=False), errors='coerce').astype('Int64')
         self.catalogo=self.filmes.merge(stats.drop_duplicates('movieId'),on='movieId',how='inner')
         self.vistos={} if treino is None else {int(u):set(g.movieId) for u,g in treino.groupby('userId')}
+        # Ponte interna para o domínio. As tabelas, IDs públicos e a ordenação
+        # numérica MovieLens permanecem intactos; não há catálogo de múltiplas fontes.
+        self.identidades_conteudo = {
+            int(i): conteudo_movielens(i) for i in self.filmes.movieId
+        }
+        self.identidades_usuarios = {u: usuario_movielens(u) for u in self.vistos}
+        self.vistos_identificados = {
+            self.identidades_usuarios[u]: frozenset(conteudo_movielens(i) for i in vistos)
+            for u, vistos in self.vistos.items()
+        }
 
     def recomendar_perfil(self, sessao, k=10):
         """Perfil exclusivamente de catálogo + estatísticas do treino; sem acesso ao teste."""
@@ -176,6 +182,9 @@ class Recomendador:
             return set(valor.split('|')) - {'(no genres listed)'}
         referencias = [generos(f.genres) for f in self.filmes.itertuples()
                        if f.movieId in sessao.referencias and f.movieId not in sessao.rejeitados]
+        # RF-01: histórico ou preferências não substituem uma referência ativa.
+        if not 1 <= len(referencias) <= 5:
+            return []
         resultados = []
         for f in self.catalogo.itertuples():
             if f.movieId in sessao.assistidos:
@@ -197,8 +206,6 @@ class Recomendador:
                 partes.append('Gêneros em comum com as referências: ' + ', '.join(sorted(comuns)))
             if comuns_preferidos:
                 partes.append('Preferências atendidas: ' + ', '.join(sorted(comuns_preferidos)))
-            if not partes:
-                partes.append('Sem referências ativas: ordenação pela nota ponderada do treino')
             partes.append('A nota ponderada do treino também compõe a pontuação')
             resultados.append({'movieId': int(f.movieId), 'titulo': f.title,
                 'ano': int(f.ano) if pd.notna(f.ano) else None, 'generos': f.genres,
@@ -228,9 +235,16 @@ class Recomendador:
         if not generos: aviso='Não reconheci gêneros no texto; usei o ranking geral. '+aviso
         return {'generos_identificados':generos,'aviso':aviso,'recomendacoes':resultados}
 
-def carregar_modelo():
-    p=ROOT/'resultados'
-    if not (p/'relatorio.json').exists(): preparar()
+def carregar_modelo(diretorio_resultados=None, *, exigir_manifesto=False,
+                    dataset_esperado=None, execucao_esperada=None):
+    p = Path(diretorio_resultados) if diretorio_resultados is not None else ROOT/'resultados'
+    validacao = validar_resultados(p, exigir_manifesto=exigir_manifesto,
+                                  dataset_esperado=dataset_esperado,
+                                  execucao_esperada=execucao_esperada)
+    if not (p/'relatorio.json').exists():
+        if diretorio_resultados is not None or validacao['integridade_verificada']:
+            raise ErroArtefatos('Relatório ausente no diretório solicitado: ' + str(p))
+        preparar()
     return Recomendador(pd.read_csv(p/'filmes.csv'),pd.read_csv(p/'ranking_treino.csv'),pd.read_csv(p/'treino.csv'))
 
 if __name__=='__main__':
@@ -238,6 +252,9 @@ if __name__=='__main__':
     parser.add_argument('--dados',help='Pasta contendo ratings.csv e movies.csv')
     parser.add_argument('--min-filme',type=int,default=5)
     parser.add_argument('--min-usuario',type=int,default=5)
+    parser.add_argument('--resultados',help='Diretório opcional de resultados')
+    parser.add_argument('--identificar',action='store_true',help='Gera manifesto em diretório vazio')
     args=parser.parse_args()
     if args.min_filme<1 or args.min_usuario<1: parser.error('Os mínimos precisam ser positivos.')
-    preparar(args.dados,args.min_filme,args.min_usuario)
+    preparar(args.dados,args.min_filme,args.min_usuario,
+             diretorio_resultados=args.resultados, identificar=args.identificar)

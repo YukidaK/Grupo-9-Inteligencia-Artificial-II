@@ -1,0 +1,10 @@
+{
+  "esquema": "cinematch.catalogo_streaming",
+  "versao": 1,
+  "regiao": "BR",
+  "verificado_em": "2026-10-30T22:30:00+00:00",
+  "estado": "pendente_evidencia_regional",
+  "fonte_documental": "https://developer.themoviedb.org/reference/watch-providers-movie-list",
+  "bloqueio": "Não foi obtida resposta regional oficial verificável. Nenhuma chamada autenticada foi executada. Autorização e revisão de condições continuam pendentes.",
+  "provedores": []
+}

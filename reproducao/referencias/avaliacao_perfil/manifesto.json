@@ -1,0 +1,118 @@
+{
+  "esquema": "cinematch.experimento.perfil",
+  "versao_esquema": 1,
+  "execucao_id": "1288f3dd-7b3f-4e84-8d92-6fe930109a0b",
+  "criado_em": "2026-10-29T01:08:57.639360+00:00",
+  "dataset": {
+    "nome": "MovieLens Latest Small",
+    "versao": "2018-09-26",
+    "fonte": "arquivos locais verificados"
+  },
+  "parametros": {
+    "seed_referencias": 42,
+    "seed_divisao_preservada": 42,
+    "fracao_teste": 0.2,
+    "min_filme": 5,
+    "min_usuario": 5,
+    "relevante": 4.0,
+    "k": 10,
+    "referencias": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "selecao": "amostra aninhada uniforme dos positivos do treino",
+    "universo": "suporte no treino - vistos; interseção de gêneros com referências > 0",
+    "preferencias_genero": "vazias; sem refinamento conversacional"
+  },
+  "entradas": {
+    "resultados/treino.csv": {
+      "sha256": "f4bfeae36b20990f5612be5ca36551ead9921a1fc9467c1484503530802850e0",
+      "bytes": 1911702
+    },
+    "resultados/teste.csv": {
+      "sha256": "877d46b94b212a0375f58c2ef370f6e7428597abad30ef86b6414d34cca623ab",
+      "bytes": 471216
+    },
+    "resultados/filmes.csv": {
+      "sha256": "89eb269977c4355bcd63820e2ec361a99bc5f09b75e3323578820df736c3a18f",
+      "bytes": 533350
+    },
+    "resultados/ranking_treino.csv": {
+      "sha256": "772663c6380997557f4128e854b106c10f80214c8fd754dd8e90f24374a360c1",
+      "bytes": 127301
+    },
+    "resultados/matriz_treino.npz": {
+      "sha256": "1303747ded217020a0316909d96f38ec94cdaf3ab249f6532f0d1969dfde8682",
+      "bytes": 184052
+    },
+    "resultados/indices_matriz.json": {
+      "sha256": "b2b8bf9592797cd0c1c6b3a5a7700dd8a069b97a3d42934275cf94e08a5b9b03",
+      "bytes": 61189
+    },
+    "resultados/metricas_por_usuario.csv": {
+      "sha256": "06f94d735f989a68b5ba6b15a4ecee0bf0fc8ddc2277f350d91a2cea9696c356",
+      "bytes": 56001
+    },
+    "resultados/relatorio.json": {
+      "sha256": "99627f0f139ed4f7124b1e7b3e3bbe0a27bf12d87170b910a729a1708a8e3576",
+      "bytes": 1329
+    },
+    "dados/ratings.csv": {
+      "sha256": "aa289ca83157595d0df6aea1be6a4ded676ddc4385472e8313a8ed9805352646",
+      "bytes": 2483723
+    },
+    "dados/movies.csv": {
+      "sha256": "5a5f32dd9bb3797b8e728a1b98958789d2b13f294a69fdfbc5727f8a9611aa07",
+      "bytes": 494431
+    },
+    "dados/README.txt": {
+      "sha256": "63d22ac138e80fae37021797ed8e1b9424b5239dc576a137422adf783ae3f404",
+      "bytes": 8342
+    }
+  },
+  "codigo": {
+    "avaliacao_perfil.py": {
+      "sha256": "a1a924964f0193c69e4541ec1579bc4ceabc255167689176ea0b4dc599867d03",
+      "bytes": 14960
+    },
+    "recomendador.py": {
+      "sha256": "67bf26fa98906611a508120723bdeadf6820c0f5b98beb95755fb3263fb13bf4",
+      "bytes": 16034
+    },
+    "conversa.py": {
+      "sha256": "ca40cb52f7dd1f41af605bb18ada6ff5d3023ea57ebb9f83225bb672881b385f",
+      "bytes": 12247
+    },
+    "identidades.py": {
+      "sha256": "334d6a588951686acb3881792239886e61b7552bdd9392000e335d79fdb55f98",
+      "bytes": 3121
+    }
+  },
+  "ambiente": {
+    "python": "3.12.3",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1"
+  },
+  "arquivos": {
+    "avaliacao_por_usuario.csv": {
+      "sha256": "c54b6c86f0cf3a1c90b9f0653138bc79847d574cef7a8310d5d512606a415361",
+      "bytes": 2025322
+    },
+    "resumo.csv": {
+      "sha256": "9b12c4f017f8a6b980e38e21846d6dc92eb50ce8719f060c7b7caba28e6883ba",
+      "bytes": 3669
+    },
+    "resumo.json": {
+      "sha256": "134375bf9b6bb9be4b5b039f33b561de11d59c528be49f059d65fa429e578c16",
+      "bytes": 14352
+    },
+    "auditoria.json": {
+      "sha256": "c53760e7bb82472983b1909da823cf8afb0f43d2bfde745d1f0f29810d06d4e4",
+      "bytes": 1256
+    }
+  }
+}

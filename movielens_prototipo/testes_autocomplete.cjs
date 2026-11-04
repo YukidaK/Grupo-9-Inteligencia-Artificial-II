@@ -2,14 +2,14 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const MovieAutocomplete=require('./static/autocomplete.js');
 class Element {
-  constructor(doc){this.ownerDocument=doc;this.children=[];this.attrs={};this.listeners={};this.value='';this.textContent='';this.hidden=false;this.disabled=false;}
+  constructor(doc){this.ownerDocument=doc;this.children=[];this.attrs={};this.listeners={};this.value='';this.textContent='';this.hidden=false;this.disabled=false;this.isConnected=true;}
   addEventListener(type,fn){this.listeners[type]=fn;}
   setAttribute(k,v){this.attrs[k]=String(v);}
   removeAttribute(k){delete this.attrs[k];}
   append(...children){this.children.push(...children);}
   replaceChildren(...children){this.children=children;}
   scrollIntoView(){this.scrolled=true;}
-  focus(){this.ownerDocument.activeElement=this;}
+  focus(){this.ownerDocument.activeElement=this;for(const f of this.ownerDocument.focusListeners||[])f({target:this});}
   emit(type,extra={}){const e={prevented:false,preventDefault(){this.prevented=true;},...extra};this.listeners[type]?.(e);return e;}
 }
 function setup(fetchSuggestions=async()=>[]){
@@ -68,13 +68,15 @@ test('sem resultados ou falha preserva seleção e campo editável',async()=>{
 
 // Exercita também o bootstrap e o fetch da página, além da classe isolada.
 const fs=require('fs'),vm=require('vm'),path=require('path');
-function fullPage({missingScript=false,oldServer=false}={}){
+function fullPage({missingScript=false,oldServer=false,response=null,requestHandler=null}={}){
   const html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
   const timers=[],nodes=new Map();
-  const doc={createElement(){const e=new Element(doc);e.dataset={};e.querySelectorAll=()=>[];e.prepend=(...n)=>e.children.unshift(...n);return e;},querySelector:s=>nodes.get(s),querySelectorAll:()=>[]};
+  const doc={createElement(tag){const e=new Element(doc);e.tagName=tag;e.dataset={};e.querySelectorAll=()=>[];e.prepend=(...n)=>e.children.unshift(...n);return e;},querySelector:s=>nodes.get(s),querySelectorAll:()=>[]};
+  doc.focusListeners=new Set();doc.addEventListener=(t,f)=>{if(t==='focusin')doc.focusListeners.add(f)};doc.removeEventListener=(t,f)=>doc.focusListeners.delete(f);doc.body=doc.createElement('body');doc.activeElement=doc.body;
   for(const [,id] of html.matchAll(/\bid="([^"]+)"/g)){const e=doc.createElement();e.id=id;nodes.set('#'+id,e);}
-  const state={mensagem:'Pronto',assistidos:[],referencias:[],excedentes:[],rejeitados:[],preferencias:{positivas:[],negativas:[]},recomendacoes:[]};
-  const context={console,AbortController,queueMicrotask,setTimeout:fn=>{timers.push(fn);return fn;},clearTimeout:fn=>{const i=timers.indexOf(fn);if(i>=0)timers.splice(i,1);},document:doc,IntersectionObserver:class{observe(){}unobserve(){}},fetch:async url=>({ok:!oldServer||!url.startsWith('/api/filmes'),status:oldServer&&url.startsWith('/api/filmes')?404:200,json:async()=>url.startsWith('/api/filmes')?{sugestoes:[film(1,'Toy Story (1995)')]}:state})};
+  const state=response||{mensagem:'Pronto',assistidos:[],referencias:[],excedentes:[],rejeitados:[],preferencias:{positivas:[],negativas:[]},recomendacoes:[]};
+  const calls=[];
+  const context={console,AbortController,queueMicrotask,Option:function(text,value){const o=doc.createElement('option');o.textContent=text;o.value=value;return o;},setTimeout:fn=>{timers.push(fn);return fn;},clearTimeout:fn=>{const i=timers.indexOf(fn);if(i>=0)timers.splice(i,1);},document:doc,IntersectionObserver:class{observe(){}unobserve(){}},fetch:async(url,options={})=>{const data=options.body?JSON.parse(options.body):null;if(data)calls.push(data);return {ok:!oldServer||!url.startsWith('/api/filmes'),status:oldServer&&url.startsWith('/api/filmes')?404:200,json:async()=>url.startsWith('/api/filmes')?{sugestoes:[film(1,'Toy Story (1995)')]}:requestHandler?requestHandler(data):state}}};
   context.window=context;vm.createContext(context);
   // Timers nativos de Window exigem o receptor correto; Node não impõe essa regra.
   context.__schedule=fn=>{timers.push(fn);return fn;};
@@ -82,7 +84,7 @@ function fullPage({missingScript=false,oldServer=false}={}){
   vm.runInContext(`window.setTimeout=function(fn){if(this!==window)throw new TypeError('Illegal invocation: setTimeout');return window.__schedule(fn);};window.clearTimeout=function(fn){if(this!==window)throw new TypeError('Illegal invocation: clearTimeout');return window.__cancel(fn);};`,context);
   if(!missingScript)vm.runInContext(fs.readFileSync(path.join(__dirname,'static/autocomplete.js'),'utf8'),context);
   const inline=html.match(/<script>([\s\S]*?)<\/script>/)[1];vm.runInContext(inline,context);
-  return {context,nodes,timers};
+  return {context,nodes,timers,calls};
 }
 test('página completa inicializa autocomplete e exibe lista após digitar',async()=>{
   const p=fullPage();await new Promise(r=>setImmediate(r));
@@ -105,4 +107,66 @@ test('página com backend antigo orienta reiniciar o servidor sem perder seleç�
   assert.match(p.nodes.get('#search-status').textContent,/Ctrl\+C/);
   assert.match(p.nodes.get('#search-status').textContent,/Ctrl\+Shift\+R/);
   assert.equal(input.disabled,false);
+});
+
+function profile(){const f=film(1,'Filme de referência (2000)');return {mensagem:'Pronto',assistidos:[f],referencias:[f],excedentes:[],rejeitados:[],preferencias:{positivas:['Drama'],negativas:['Horror']},recomendacoes:[]};}
+test('ações de referência são compactas, contextualizadas e retirada não envia rejeição',async()=>{
+  const initial=profile(),after={...initial,mensagem:'Selecione pelo menos um filme como referência ativa.',referencias:[],excedentes:initial.assistidos};
+  const p=fullPage({response:initial,requestHandler:d=>d.acao==='remover_referencia'?after:initial});await new Promise(r=>setImmediate(r));
+  const actions=p.nodes.get('#refs').children[0].children.find(e=>e.tagName==='details');
+  assert.ok(actions);assert.equal(actions.open,undefined);
+  const [summary,remove,reject]=actions.children;
+  assert.equal(summary.tagName,'summary');assert.match(summary.attrs['aria-label'],/Filme de referência/);
+  assert.equal(remove.textContent,'Remover referência');assert.match(remove.attrs['aria-label'],/Remover referência: Filme de referência/);
+  assert.equal(reject.textContent,'Não gostei');
+  await remove.onclick();
+  assert.deepEqual(p.calls.at(-1),{acao:'remover_referencia',movieId:1});
+  assert.equal(p.calls.some(d=>d.acao==='rejeitar'),false);
+  assert.match(p.nodes.get('#status').textContent,/Selecione pelo menos um/);
+  assert.equal(p.nodes.get('#refs').children[0].textContent,'Nenhum filme.');
+  const consider=p.nodes.get('#extras').children[0].children.find(e=>e.textContent==='Considerar');
+  assert.ok(consider);await consider.onclick();
+  assert.equal(p.calls.at(-1).acao,'considerar');assert.equal(p.calls.at(-1).movieId,1);
+  assert.match(p.nodes.get('#prefs').textContent,/Drama/);assert.match(p.nodes.get('#prefs').textContent,/Horror/);
+});
+test('não gostei mantém rejeitar e falha na retirada preserva o perfil exibido',async()=>{
+  const initial=profile();let fail=false;
+  const p=fullPage({response:initial,requestHandler:d=>{if(fail&&d.acao==='remover_referencia')throw Error('offline');return initial;}});await new Promise(r=>setImmediate(r));
+  let actions=p.nodes.get('#refs').children[0].children.find(e=>e.tagName==='details');
+  await actions.children[2].onclick();assert.deepEqual(p.calls.at(-1),{acao:'rejeitar',movieId:1});
+  actions=p.nodes.get('#refs').children[0].children.find(e=>e.tagName==='details');fail=true;
+  await actions.children[1].onclick();assert.match(p.nodes.get('#status').textContent,/Não foi possível concluir/);
+  assert.equal(p.nodes.get('#refs').children.length,1);assert.match(p.nodes.get('#refs').children[0].textContent,/Filme de referência/);
+});
+
+const tick=()=>new Promise(r=>setImmediate(r));
+async function confirmation({fail=false}={}){
+ let resolve;const p=fullPage({requestHandler:d=>d.acao==='confirmar_selecao'?new Promise(r=>resolve=r):profile()});await tick();
+ vm.runInContext('autocomplete.items=[{movieId:2,titulo:"Filme sintético"}]',p.context);
+ const button=p.nodes.get('#confirm-selection');button.focus();
+ const pending=p.nodes.get('#search').onsubmit({preventDefault(){}});await tick();
+ p.context.document.activeElement=p.context.document.body;
+ return {p,button,pending,finish:()=>resolve(fail?Promise.reject(Error('falha sintética')):profile())};
+}
+test('UX02 confirmação bem-sucedida foca título estável do perfil',async()=>{
+ const c=await confirmation();c.finish();await c.pending;
+ assert.equal(c.p.context.document.activeElement,c.p.nodes.get('#profile-title'));
+ assert.equal(c.p.context.document.focusListeners.size,0);
+});
+test('UX02 falha restaura confirmação e mantém mensagem de erro',async()=>{
+ const c=await confirmation({fail:true});c.finish();await c.pending;
+ assert.equal(c.p.context.document.activeElement,c.button);assert.match(c.p.nodes.get('#status').textContent,/falha sintética/);
+});
+test('UX02 não rouba foco se usuário navega durante confirmação',async()=>{
+ const c=await confirmation();const other=c.p.nodes.get('#titles');other.focus();c.finish();await c.pending;
+ assert.equal(c.p.context.document.activeElement,other);
+});
+test('UX02 registra navegação mesmo se foco depois volta ao body',async()=>{
+ const c=await confirmation();c.p.nodes.get('#titles').focus();c.p.context.document.activeElement=c.p.context.document.body;c.finish();await c.pending;
+ assert.equal(c.p.context.document.activeElement,c.p.context.document.body);
+});
+test('UX02 retirada neutra leva ao perfil; falha retorna ao botão',async()=>{
+ let failed=false;const p=fullPage({response:profile(),requestHandler:d=>{if(failed&&d.acao==='remover_referencia')throw Error('falha');return profile();}});await tick();
+ let remove=p.nodes.get('#refs').children[0].children.find(e=>e.tagName==='details').children[1];remove.focus();await remove.onclick();assert.equal(p.context.document.activeElement,p.nodes.get('#profile-title'));
+ remove=p.nodes.get('#refs').children[0].children.find(e=>e.tagName==='details').children[1];failed=true;remove.focus();await remove.onclick();assert.equal(p.context.document.activeElement,remove);
 });

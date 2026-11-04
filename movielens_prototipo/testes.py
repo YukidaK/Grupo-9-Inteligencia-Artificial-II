@@ -40,10 +40,36 @@ class Testes(unittest.TestCase):
 def load_tests(loader, tests, pattern):
     import testes_conversa
     import testes_posteres
+    import testes_protecao_posteres
+    tests.addTests(loader.loadTestsFromModule(testes_protecao_posteres))
     import testes_autocomplete
+    import testes_artefatos
+    import testes_identidades
+    import testes_avaliacao_perfil
+    import testes_divisao_interna
+    import testes_avaliacao_interna
+    import testes_item_item
+    import testes_disponibilidade
+    import testes_tmdb_disponibilidade
+    import testes_filtro_streaming
+    import testes_streaming_web
+    import testes_operacao_externa
+    tests.addTests(loader.loadTestsFromModule(testes_operacao_externa))
+    import testes_catalogo_streaming
     tests.addTests(loader.loadTestsFromModule(testes_conversa))
     tests.addTests(loader.loadTestsFromModule(testes_posteres))
     tests.addTests(loader.loadTestsFromModule(testes_autocomplete))
+    tests.addTests(loader.loadTestsFromModule(testes_artefatos))
+    tests.addTests(loader.loadTestsFromModule(testes_identidades))
+    tests.addTests(loader.loadTestsFromModule(testes_avaliacao_perfil))
+    tests.addTests(loader.loadTestsFromModule(testes_divisao_interna))
+    tests.addTests(loader.loadTestsFromModule(testes_avaliacao_interna))
+    tests.addTests(loader.loadTestsFromModule(testes_item_item))
+    tests.addTests(loader.loadTestsFromModule(testes_disponibilidade))
+    tests.addTests(loader.loadTestsFromModule(testes_tmdb_disponibilidade))
+    tests.addTests(loader.loadTestsFromModule(testes_filtro_streaming))
+    tests.addTests(loader.loadTestsFromModule(testes_streaming_web))
+    tests.addTests(loader.loadTestsFromModule(testes_catalogo_streaming))
     return tests
 
 if __name__=='__main__':unittest.main()

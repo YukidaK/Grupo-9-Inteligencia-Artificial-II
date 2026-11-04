@@ -1,0 +1,109 @@
+{
+  "esquema": "cinematch.experimento.divisao_interna",
+  "versao_esquema": 1,
+  "execucao_id": "20e81ee2-5f1d-4a33-bf55-a4cf6436960f",
+  "criado_em": "2026-10-29T22:41:43.558656+00:00",
+  "fonte": {
+    "treino": {
+      "sha256": "f4bfeae36b20990f5612be5ca36551ead9921a1fc9467c1484503530802850e0",
+      "bytes": 1911702
+    },
+    "manifesto_procedencia": {
+      "sha256": "ac17a4b7f1f1b387910f01c175a30796456b647ad18a948f6a684a7fc4a4bd83",
+      "bytes": 3667
+    },
+    "execucao_procedencia": "1288f3dd-7b3f-4e84-8d92-6fe930109a0b",
+    "dataset": {
+      "nome": "MovieLens Latest Small",
+      "versao": "2018-09-26",
+      "fonte": "arquivos locais verificados"
+    },
+    "seed_divisao_original": 42,
+    "identidade_registros": "d9cd9e61d58056070959cb9bdd3f8581674f3a13cb6140b124ad264a2150ae20"
+  },
+  "parametros_divisao": {
+    "seed": 101,
+    "fracao_validacao": 0.2,
+    "algoritmo": "recomendador.dividir: default_rng/choice sem reposição por usuário; IDs ordenados",
+    "n_validacao": "0 se n=1; senão min(n-1, max(1, floor(n*fracao)))"
+  },
+  "protocolo_futuro": {
+    "relevante": 4.0,
+    "referencias": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "seed_referencias_proposta": 201,
+    "min_usuario_proposto": 5,
+    "min_filme_proposto": 5,
+    "sem_positivos_suficientes": "não elegível para aquele tamanho, sem fallback",
+    "historico_excluido": "todas as avaliações do desenvolvimento individual",
+    "validacao": "somente métricas posteriores à geração; não executadas nesta etapa"
+  },
+  "contagens": {
+    "origem": {
+      "avaliacoes": 80896,
+      "usuarios": 610,
+      "filmes": 8960
+    },
+    "desenvolvimento": {
+      "avaliacoes": 64960,
+      "usuarios": 610,
+      "filmes": 8262
+    },
+    "validacao": {
+      "avaliacoes": 15936,
+      "usuarios": 610,
+      "filmes": 4635
+    },
+    "intersecao_pares": 0,
+    "conservacao_integral": true,
+    "usuarios_historico_unitario_so_desenvolvimento": 0,
+    "usuarios_sem_validacao": 0,
+    "usuarios_sem_positivos_desenvolvimento": 1,
+    "usuarios_referencias_suficientes": {
+      "1": 609,
+      "2": 608,
+      "3": 604,
+      "4": 601,
+      "5": 594
+    },
+    "usuarios_minimo_cinco_desenvolvimento": 610
+  },
+  "arquivos": {
+    "desenvolvimento.csv": {
+      "sha256": "bf6b2dee6dde76d90d31926e59430b24db9cd4047bd126f7d8c6872663371927",
+      "bytes": 1535118
+    },
+    "validacao.csv": {
+      "sha256": "5c75a2ac3974bd959cf061cdd1c925fb1b58f47e0dee3fec0e4c6d1fd2c5b5b3",
+      "bytes": 376616
+    },
+    "auditoria.json": {
+      "sha256": "41638b52c0a201ee079527fbbe31888abf28993b45fb85145ca3508969600baf",
+      "bytes": 618
+    }
+  },
+  "codigo": {
+    "divisao_interna.py": {
+      "sha256": "0fec8e0edf94cc3f5e88fd60dec495230c46ae69d34d880e1f1215e03d10aa77",
+      "bytes": 14843
+    },
+    "recomendador.py": {
+      "sha256": "67bf26fa98906611a508120723bdeadf6820c0f5b98beb95755fb3263fb13bf4",
+      "bytes": 16034
+    },
+    "avaliacao_perfil.py": {
+      "sha256": "a1a924964f0193c69e4541ec1579bc4ceabc255167689176ea0b4dc599867d03",
+      "bytes": 14960
+    }
+  },
+  "ambiente": {
+    "python": "3.12.3",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5"
+  }
+}

@@ -2,7 +2,6 @@
 import json
 import re
 import secrets
-import threading
 import time
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -12,6 +11,9 @@ from recomendador import carregar_modelo
 from conversa import Conversa, Sessao
 from posteres import Posteres, PLACEHOLDER
 from busca import BuscaCatalogo
+from estado_sessao import EstadoSessao
+from operacao_externa import TravaRegistro
+from streaming_web import executar_streaming, CATALOGO_BR
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -20,7 +22,26 @@ class Handler(BaseHTTPRequestHandler):
     busca = None
     busca_modelo = None
     sessoes = {}
-    trava = threading.RLock()
+    trava = TravaRegistro()
+    _estados = {}
+    catalogo_streaming = CATALOGO_BR
+
+    def _sessao_atual(self):
+        """Chamar sob trava; preserva cookie e expiração anteriores."""
+        cookie = SimpleCookie()
+        cookie.load(self.headers.get('Cookie', ''))
+        sid = cookie['cinematch'].value if 'cinematch' in cookie else None
+        agora = time.monotonic()
+        for chave, (_, instante) in list(self.sessoes.items()):
+            if agora - instante > 7200 and not getattr(self._estados.get(chave),'ativos',0):
+                del self.sessoes[chave]
+        for chave in list(self._estados):
+            if chave not in self.sessoes and not self._estados[chave].ativos:del self._estados[chave]
+        if sid not in self.sessoes:
+            sid = secrets.token_urlsafe(32)
+            self.novo_cookie = sid
+            self.sessoes[sid] = (Sessao(), agora)
+        return sid,self.sessoes[sid][0],agora
 
     def responder(self, status, conteudo, tipo):
         self.send_response(status)
@@ -49,8 +70,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.responder(200, json.dumps({'sugestoes': resultado}, ensure_ascii=False).encode(), 'application/json; charset=utf-8')
             except ValueError as erro:
                 self.responder(400, json.dumps({'erro': str(erro)}).encode(), 'application/json; charset=utf-8')
-        elif caminho == '/static/autocomplete.js':
-            self.responder(200, Path(__file__).with_name('static').joinpath('autocomplete.js').read_bytes(), 'text/javascript; charset=utf-8')
+        elif caminho in ('/static/autocomplete.js','/static/streaming.js'):
+            self.responder(200, Path(__file__).with_name('static').joinpath(caminho.rsplit('/',1)[1]).read_bytes(), 'text/javascript; charset=utf-8')
         elif caminho == PLACEHOLDER:
             self.responder(200, Path(__file__).with_name('static').joinpath('poster-placeholder.svg').read_bytes(), 'image/svg+xml')
         elif re.fullmatch(r'/api/poster/[1-9][0-9]{0,9}', caminho):
@@ -64,7 +85,7 @@ class Handler(BaseHTTPRequestHandler):
             self.responder(404, b'Nao encontrado', 'text/plain; charset=utf-8')
 
     def do_POST(self):
-        if self.path != '/api/recomendar':
+        if self.path not in ('/api/recomendar','/api/streaming'):
             self.responder(404, b'{}', 'application/json')
             return
         try:
@@ -77,21 +98,20 @@ class Handler(BaseHTTPRequestHandler):
             dados = json.loads(self.rfile.read(tamanho))
             if not isinstance(dados, dict):
                 raise ValueError('Envie um objeto JSON.')
-            cookie = SimpleCookie()
-            cookie.load(self.headers.get('Cookie', ''))
-            sid = cookie['cinematch'].value if 'cinematch' in cookie else None
             with self.trava:
-                agora = time.monotonic()
-                for chave, (_, instante) in list(self.sessoes.items()):
-                    if agora - instante > 7200:
-                        del self.sessoes[chave]
-                if sid not in self.sessoes:
-                    sid = secrets.token_urlsafe(32)
-                    self.novo_cookie = sid
-                    self.sessoes[sid] = (Sessao(), agora)
-                sessao, _ = self.sessoes[sid]
-                resposta = Conversa(self.modelo).executar(sessao, dados)
-                self.sessoes[sid] = (sessao, agora)
+                sid,sessao,agora = self._sessao_atual()
+                estado=self._estados.get(sid)
+                if estado is None or estado.sessao is not sessao:
+                    estado=EstadoSessao(sessao);self._estados[sid]=estado
+                estado.ativos+=1
+            try:
+                resposta=estado.executar(lambda s:(executar_streaming(s,dados,self.catalogo_streaming)
+                    if self.path=='/api/streaming' else Conversa(self.modelo).executar(s,dados)),
+                    mutacao=dados.get('acao')!='estado')
+            finally:
+                with self.trava:
+                    estado.ativos-=1
+                    self.sessoes[sid]=(sessao,time.monotonic())
             self.responder(200, json.dumps(resposta, ensure_ascii=False).encode(), 'application/json; charset=utf-8')
         except (ValueError, TypeError, OverflowError) as erro:
             self.responder(400, json.dumps({'erro': str(erro)}, ensure_ascii=False).encode(), 'application/json; charset=utf-8')

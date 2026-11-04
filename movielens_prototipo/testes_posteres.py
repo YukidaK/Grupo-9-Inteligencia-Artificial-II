@@ -8,10 +8,18 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import urllib.error
+from operacao_externa import ControleExterno
 from posteres import Posteres, PLACEHOLDER, carregar_links, carregar_ambiente
 from app import Handler
 from testes_conversa import fixture
 from conversa import Sessao
+
+
+class RespostaPoster(io.BytesIO):
+    def __init__(self,url,dados):
+        super().__init__(json.dumps(dados).encode());self.url=url
+        self.status=200;self.headers={'Content-Type':'application/json'}
+    def geturl(self):return self.url
 
 
 class TMDB(unittest.TestCase):
@@ -28,10 +36,10 @@ class TMDB(unittest.TestCase):
         self.assertEqual(req.get_header('Authorization'), 'Bearer token-ficticio')
         self.assertNotIn('token-ficticio', req.full_url)
         resposta = {'images': {'secure_base_url': 'https://image.tmdb.org/t/p/', 'poster_sizes': ['w185', 'w342', 'w500', 'original']}} if req.full_url.endswith('/configuration') else self.movie
-        return io.BytesIO(json.dumps(resposta).encode())
+        return RespostaPoster(req.full_url,resposta)
 
     def servico(self, cache=None):
-        p = Posteres({1: 862}, 'token-ficticio', cache, self.abrir, lambda: self.instante)
+        p = Posteres({1: 862}, 'token-ficticio', cache, self.abrir, lambda: self.instante, controle=ControleExterno(relogio=lambda:self.instante))
         # Remove apenas a espera entre chamadas dos testes; relógio de validade controlado.
         return p
 
