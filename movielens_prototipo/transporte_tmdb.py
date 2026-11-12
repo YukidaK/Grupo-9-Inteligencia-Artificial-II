@@ -1,6 +1,4 @@
-"""RF-02B: transporte especializado, desativado por padrão e fora da aplicação."""
-from collections import OrderedDict
-from dataclasses import dataclass
+"""Transporte TMDB do piloto de títulos, desativado por padrão."""
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from http.client import HTTPException
@@ -12,17 +10,33 @@ import threading
 import time
 import urllib.error
 import urllib.request
-from urllib.parse import urlencode
-
-from disponibilidade import (
-    Disponibilidades, Estado, FONTE, FalhaConsulta, _id, _regiao, _horario,
-    catalogo_provedores, ler_cache, gravar_cache, ConsultaControlada,
-)
-from operacao_externa import (ControleExterno, controle_credencial, ConsultasPorChave,
-    LimiteOperacional, espera_permitida)
-from identidades import IdentidadeConteudo, TipoConteudo
-
+from operacao_externa import (ControleExterno, controle_credencial, LimiteOperacional, espera_permitida)
 API = 'https://api.themoviedb.org/3'
+
+
+def _id(valor):
+    if type(valor) is not int or valor <= 0:
+        raise ValueError('Identificador deve ser inteiro positivo.')
+    return valor
+
+
+def _horario(valor):
+    if not isinstance(valor, datetime) or valor.utcoffset() is None:
+        raise ValueError('Horário deve informar fuso explícito.')
+
+
+class FalhaConsulta(OSError):
+    """Falha sanitizada de transporte; nunca conserva erro remoto ou token."""
+    CODIGOS = frozenset({'HTTP_401','HTTP_403','HTTP_404','HTTP_429','HTTP_5XX','HTTP_OUTRO',
+        'TIMEOUT','CONEXAO','RESPOSTA_INVALIDA','RESPOSTA_EXCESSIVA',
+        'INTEGRACAO_DESATIVADA','SEM_CREDENCIAL','CREDENCIAL_INVALIDA',
+        'CONSULTA_SUSPENSA','REDIRECIONAMENTO_BLOQUEADO'})
+
+    def __init__(self,codigo):
+        if codigo not in self.CODIGOS: raise ValueError('Código de falha não permitido.')
+        self.codigo = codigo
+        super().__init__(codigo)
+
 
 
 class SemRedirecionamento(urllib.request.HTTPRedirectHandler):
@@ -159,114 +173,3 @@ class TransporteTMDB:
             raise FalhaConsulta('RESPOSTA_INVALIDA') from None
         except (ValueError,UnicodeError,TypeError,AttributeError):
             raise FalhaConsulta('RESPOSTA_INVALIDA') from None
-
-    def consultar_filme(self,tmdb_id,regiao='BR'):
-        _id(tmdb_id)
-        _regiao(regiao)
-        if tmdb_id not in self._ids:
-            raise ValueError('TMDB ID não pertence ao mapeamento validado de filmes.')
-        # Este endpoint retorna países no corpo; região não é idioma nem query aqui.
-        return self._json(f'/movie/{tmdb_id}/watch/providers')
-
-    def consultar_catalogo(self,regiao='BR',idioma='pt-BR'):
-        _regiao(regiao)
-        if not isinstance(idioma,str) or not re.fullmatch('[a-z]{2}-[A-Z]{2}',idioma):
-            raise ValueError('Idioma deve usar formato como pt-BR.')
-        return self._json('/watch/providers/movie?'+urlencode({'watch_region':regiao,'language':idioma}))
-
-
-@dataclass(frozen=True)
-class CatalogoRegional:
-    regiao: str
-    idioma: str
-    consultado_em: datetime
-    expira_em: datetime
-    estado: Estado
-    provedores: tuple
-    motivo: str
-    fonte: str = FONTE
-
-
-class ClienteDisponibilidadeTMDB:
-    def __init__(self,links,*,habilitado=False,termos_aprovados=False,abrir=None,
-                 relogio=None,monotono=None,esperar=None,timeout=3.,max_bytes=1024*1024,
-                 limite=512,limite_catalogo=32,controle=None):
-        if type(limite_catalogo) is not int or limite_catalogo<1:
-            raise ValueError('Limite de catálogo inválido.')
-        self._voos=ConsultasPorChave()
-        self._trava = self._voos.trava
-        self._catalogos = OrderedDict()
-        self._limite_catalogo = limite_catalogo
-        self._agora = relogio or (lambda:datetime.now(timezone.utc))
-        # Validação dos vínculos é feita ANTES de construir o transporte.
-        self._disponibilidades = Disponibilidades(links,lambda *a:None,relogio=self._agora,limite=limite)
-        ids = [i for c,i in self._disponibilidades.links.items() if c.tipo is TipoConteudo.FILME]
-        self._transporte = TransporteTMDB(ids,habilitado=habilitado,termos_aprovados=termos_aprovados,
-            abrir=abrir,relogio=self._agora,monotono=monotono,esperar=esperar,timeout=timeout,max_bytes=max_bytes,controle=controle)
-        self._disponibilidades.consultar = self._transporte.consultar_filme
-
-    def obter(self,conteudo,regiao='BR'):
-        return self.obter_controlado(conteudo,regiao,permitir_consulta=True).disponibilidade
-
-    def obter_controlado(self,conteudo,regiao='BR',*,permitir_consulta=False):
-        if type(permitir_consulta) is not bool:raise ValueError('Permissão deve ser explícita.')
-        def ler():
-            local=self._disponibilidades.obter_sem_consulta(conteudo,regiao)
-            return local if local.origem!='NAO_VERIFICADO' or not permitir_consulta else None
-        def produzir():
-            base=self._disponibilidades
-            # Cache privado transitório: a rede nunca mantém a trava do cache compartilhado.
-            isolado=Disponibilidades({conteudo:base.links[conteudo]},base.consultar,relogio=base.agora,ttl=base.ttl,
-                ttl_desconhecido=base.ttl_desconhecido,ttl_erro=base.ttl_erro,limite=base.limite)
-            dados=isolado.obter(conteudo,regiao)
-            return ConsultaControlada(dados,'CONSULTA',getattr(self._transporte._local,'chamadas',0))
-        def gravar(retorno):
-            dados=retorno.disponibilidade
-            chave=(conteudo,dados.tmdb_id,regiao,FONTE)
-            gravar_cache(self._disponibilidades.cache,chave,dados,self._disponibilidades.limite)
-        # Valida antes de construir chave. ler() faz também validação da região.
-        with self._trava:
-            anterior=ler()
-            if anterior is not None:return anterior
-        try:
-            retorno,lider=self._voos.executar(('filme',conteudo,regiao),ler,produzir,gravar)
-            return retorno
-        except LimiteOperacional as erro:
-            from datetime import timedelta
-            from disponibilidade import Disponibilidade
-            agora=self._agora()
-            dados=Disponibilidade(conteudo,self._disponibilidades.links.get(conteudo),regiao,
-                agora,agora+timedelta(seconds=60),Estado.ERRO,motivo='TIMEOUT')
-            return ConsultaControlada(dados,'LOCAL')
-
-    def provedores(self,regiao='BR',idioma='pt-BR'):
-        _regiao(regiao)
-        if not isinstance(idioma,str) or not re.fullmatch('[a-z]{2}-[A-Z]{2}',idioma):
-            raise ValueError('Idioma deve usar formato como pt-BR.')
-        chave=('catalogo_filmes',regiao,idioma,FONTE)
-        def ler():return ler_cache(self._catalogos,chave,self._agora())
-        try:
-            resposta,_=self._voos.executar(chave,ler,lambda:self._produzir_catalogo(regiao,idioma),
-                lambda r:gravar_cache(self._catalogos,chave,r,self._limite_catalogo))
-            return resposta
-        except LimiteOperacional:
-            agora=self._agora()
-            return CatalogoRegional(regiao,idioma,agora,agora+self._disponibilidades.ttl_erro,Estado.ERRO,(),'TIMEOUT')
-
-    def _produzir_catalogo(self,regiao='BR',idioma='pt-BR'):
-        _regiao(regiao)
-        if not isinstance(idioma,str) or not re.fullmatch('[a-z]{2}-[A-Z]{2}',idioma):
-            raise ValueError('Idioma deve usar formato como pt-BR.')
-        agora = self._agora()
-        _horario(agora)
-        chave = ('catalogo_filmes',regiao,idioma,FONTE)
-        try:
-            dados = catalogo_provedores(self._transporte.consultar_catalogo(regiao,idioma))
-            estado,motivo = (Estado.CONFIRMADA,'PROVEDORES_REPORTADOS') if dados else (Estado.DESCONHECIDA,'SEM_PROVEDORES_REPORTADOS')
-            ttl = self._disponibilidades.ttl if dados else self._disponibilidades.ttl_desconhecido
-        except (FalhaConsulta,ValueError,TypeError,KeyError) as erro:
-            dados,estado = (),Estado.ERRO
-            motivo = erro.codigo if isinstance(erro,FalhaConsulta) else 'RESPOSTA_INVALIDA'
-            ttl = self._disponibilidades.ttl_erro
-        resposta = CatalogoRegional(regiao,idioma,agora,agora+ttl,estado,dados,motivo)
-        return resposta

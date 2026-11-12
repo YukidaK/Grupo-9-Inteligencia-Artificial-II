@@ -1,0 +1,38 @@
+{
+  "esquema": "cinematch.titulos",
+  "versao": 1,
+  "idioma": "pt-BR",
+  "procedimento": "curadoria manual de título comercial e ano, com IDs conferidos em movies.csv e links.csv; sem resposta autenticada TMDB",
+  "filmes": [
+    {
+      "movieId": 858,
+      "tmdbId": 238,
+      "titulo_catalogo": "Godfather, The (1972)",
+      "ano": 1972,
+      "titulo_br": "O Poderoso Chefão",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/o-poderoso-chefao/umc.cmc.3ew9fykdnpfaq9t2jq5da011c",
+      "verificado_em": "2026-11-11"
+    },
+    {
+      "movieId": 318,
+      "tmdbId": 278,
+      "titulo_catalogo": "Shawshank Redemption, The (1994)",
+      "ano": 1994,
+      "titulo_br": "Um Sonho de Liberdade",
+      "alternativos": [],
+      "fonte": "https://www.hbomax.com/br/pt/movie/9b4dacba-2f80-4272-aac7-bb5e2ae91343",
+      "verificado_em": "2026-11-11"
+    },
+    {
+      "movieId": 3147,
+      "tmdbId": 497,
+      "titulo_catalogo": "Green Mile, The (1999)",
+      "ano": 1999,
+      "titulo_br": "À Espera de um Milagre",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/a-espera-de-um-milagre/umc.cmc.7hcm0jk7o0ko95ghs171h7v41",
+      "verificado_em": "2026-11-11"
+    }
+  ]
+}

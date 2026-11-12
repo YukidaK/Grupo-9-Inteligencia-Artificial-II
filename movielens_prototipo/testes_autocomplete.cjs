@@ -56,10 +56,13 @@ test('mouse/toque seleciona, duplicata por ID é impedida e remoção funciona',
   w.selected.children[0].children[1].onclick();assert.equal(w.widget.items.length,0);
   w.widget.existing=()=>[film(2)];results(w,[film(2)]);w.widget.choose(0);assert.equal(w.widget.items.length,0);
 });
-test('mais de cinco selecionados, etiquetas de excedentes e nenhuma seleção perdida',()=>{
+test('seleção limita cinco, permite remover e escolher novamente',()=>{
   const w=setup();for(let i=1;i<=7;i++){results(w,[film(i)]);w.widget.choose(0);}
-  assert.equal(w.widget.items.length,7);assert.match(w.selected.children[4].children[0].textContent,/Referência/);assert.match(w.selected.children[5].children[0].textContent,/Excedente/);
-  w.widget.confirmed([1,2,3,4,5,6]);assert.deepEqual(w.widget.items.map(f=>f.movieId),[7]);w.widget.reset();assert.equal(w.widget.items.length,0);
+  assert.equal(w.widget.items.length,5);assert.match(w.status.textContent,/cinco filmes/);
+  w.selected.children[0].children[1].onclick();
+  results(w,[film(6)]);w.widget.choose(0);
+  assert.deepEqual(w.widget.items.map(f=>f.movieId),[2,3,4,5,6]);
+  w.widget.confirmed([2,3,4,5,6]);assert.equal(w.widget.items.length,0);
 });
 test('sem resultados ou falha preserva seleção e campo editável',async()=>{
   const w=setup(async()=>[]);results(w,[film(1)]);w.widget.choose(0);w.input.value='Nada';w.input.emit('input');await w.fire();assert.equal(w.widget.items.length,1);assert.match(w.status.textContent,/Nenhum/);
@@ -68,15 +71,15 @@ test('sem resultados ou falha preserva seleção e campo editável',async()=>{
 
 // Exercita também o bootstrap e o fetch da página, além da classe isolada.
 const fs=require('fs'),vm=require('vm'),path=require('path');
-function fullPage({missingScript=false,oldServer=false,response=null,requestHandler=null}={}){
+function fullPage({missingScript=false,oldServer=false,protocol='http:',response=null,requestHandler=null}={}){
   const html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
   const timers=[],nodes=new Map();
   const doc={createElement(tag){const e=new Element(doc);e.tagName=tag;e.dataset={};e.querySelectorAll=()=>[];e.prepend=(...n)=>e.children.unshift(...n);return e;},querySelector:s=>nodes.get(s),querySelectorAll:()=>[]};
   doc.focusListeners=new Set();doc.addEventListener=(t,f)=>{if(t==='focusin')doc.focusListeners.add(f)};doc.removeEventListener=(t,f)=>doc.focusListeners.delete(f);doc.body=doc.createElement('body');doc.activeElement=doc.body;
   for(const [,id] of html.matchAll(/\bid="([^"]+)"/g)){const e=doc.createElement();e.id=id;nodes.set('#'+id,e);}
-  const state=response||{mensagem:'Pronto',assistidos:[],referencias:[],excedentes:[],rejeitados:[],preferencias:{positivas:[],negativas:[]},recomendacoes:[]};
+  const state=response||{mensagem:'Pronto',assistidos:[],referencias:[],recomendacoes:[]};
   const calls=[];
-  const context={console,AbortController,queueMicrotask,Option:function(text,value){const o=doc.createElement('option');o.textContent=text;o.value=value;return o;},setTimeout:fn=>{timers.push(fn);return fn;},clearTimeout:fn=>{const i=timers.indexOf(fn);if(i>=0)timers.splice(i,1);},document:doc,IntersectionObserver:class{observe(){}unobserve(){}},fetch:async(url,options={})=>{const data=options.body?JSON.parse(options.body):null;if(data)calls.push(data);return {ok:!oldServer||!url.startsWith('/api/filmes'),status:oldServer&&url.startsWith('/api/filmes')?404:200,json:async()=>url.startsWith('/api/filmes')?{sugestoes:[film(1,'Toy Story (1995)')]}:requestHandler?requestHandler(data):state}}};
+  const context={console,location:{protocol},AbortController,queueMicrotask,Option:function(text,value){const o=doc.createElement('option');o.textContent=text;o.value=value;return o;},setTimeout:fn=>{timers.push(fn);return fn;},clearTimeout:fn=>{const i=timers.indexOf(fn);if(i>=0)timers.splice(i,1);},document:doc,IntersectionObserver:class{observe(){}unobserve(){}},fetch:async(url,options={})=>{const data=options.body?JSON.parse(options.body):null;if(data)calls.push(data);return {ok:!oldServer||!url.startsWith('/api/filmes'),status:oldServer&&url.startsWith('/api/filmes')?404:200,json:async()=>url.startsWith('/api/filmes')?{sugestoes:[film(1,'Toy Story (1995)')]}:requestHandler?requestHandler(data):state}}};
   context.window=context;vm.createContext(context);
   // Timers nativos de Window exigem o receptor correto; Node não impõe essa regra.
   context.__schedule=fn=>{timers.push(fn);return fn;};
@@ -101,6 +104,13 @@ test('arquivo do widget ausente não derruba o restante da página',async()=>{
   assert.match(p.nodes.get('#search-status').textContent,/não carregou/);
   assert.equal(p.nodes.get('#status').textContent,'Pronto');
 });
+test('HTML aberto como arquivo orienta usar o servidor e não chama a API',()=>{
+  const p=fullPage({missingScript:true,protocol:'file:'});
+  assert.equal(p.nodes.get('#titles').disabled,true);
+  assert.equal(p.nodes.get('#confirm-selection').disabled,true);
+  assert.match(p.nodes.get('#search-status').textContent,/http:\/\/127\.0\.0\.1:8000/);
+  assert.deepEqual(p.calls,[]);
+});
 test('página com backend antigo orienta reiniciar o servidor sem perder seleção',async()=>{
   const p=fullPage({oldServer:true});await new Promise(r=>setImmediate(r));
   const input=p.nodes.get('#titles');input.value='Toy';input.emit('input');await p.timers.shift()();
@@ -109,35 +119,9 @@ test('página com backend antigo orienta reiniciar o servidor sem perder seleç�
   assert.equal(input.disabled,false);
 });
 
-function profile(){const f=film(1,'Filme de referência (2000)');return {mensagem:'Pronto',assistidos:[f],referencias:[f],excedentes:[],rejeitados:[],preferencias:{positivas:['Drama'],negativas:['Horror']},recomendacoes:[]};}
-test('ações de referência são compactas, contextualizadas e retirada não envia rejeição',async()=>{
-  const initial=profile(),after={...initial,mensagem:'Selecione pelo menos um filme como referência ativa.',referencias:[],excedentes:initial.assistidos};
-  const p=fullPage({response:initial,requestHandler:d=>d.acao==='remover_referencia'?after:initial});await new Promise(r=>setImmediate(r));
-  const actions=p.nodes.get('#refs').children[0].children.find(e=>e.tagName==='details');
-  assert.ok(actions);assert.equal(actions.open,undefined);
-  const [summary,remove,reject]=actions.children;
-  assert.equal(summary.tagName,'summary');assert.match(summary.attrs['aria-label'],/Filme de referência/);
-  assert.equal(remove.textContent,'Remover referência');assert.match(remove.attrs['aria-label'],/Remover referência: Filme de referência/);
-  assert.equal(reject.textContent,'Não gostei');
-  await remove.onclick();
-  assert.deepEqual(p.calls.at(-1),{acao:'remover_referencia',movieId:1});
-  assert.equal(p.calls.some(d=>d.acao==='rejeitar'),false);
-  assert.match(p.nodes.get('#status').textContent,/Selecione pelo menos um/);
-  assert.equal(p.nodes.get('#refs').children[0].textContent,'Nenhum filme.');
-  const consider=p.nodes.get('#extras').children[0].children.find(e=>e.textContent==='Considerar');
-  assert.ok(consider);await consider.onclick();
-  assert.equal(p.calls.at(-1).acao,'considerar');assert.equal(p.calls.at(-1).movieId,1);
-  assert.match(p.nodes.get('#prefs').textContent,/Drama/);assert.match(p.nodes.get('#prefs').textContent,/Horror/);
-});
-test('não gostei mantém rejeitar e falha na retirada preserva o perfil exibido',async()=>{
-  const initial=profile();let fail=false;
-  const p=fullPage({response:initial,requestHandler:d=>{if(fail&&d.acao==='remover_referencia')throw Error('offline');return initial;}});await new Promise(r=>setImmediate(r));
-  let actions=p.nodes.get('#refs').children[0].children.find(e=>e.tagName==='details');
-  await actions.children[2].onclick();assert.deepEqual(p.calls.at(-1),{acao:'rejeitar',movieId:1});
-  actions=p.nodes.get('#refs').children[0].children.find(e=>e.tagName==='details');fail=true;
-  await actions.children[1].onclick();assert.match(p.nodes.get('#status').textContent,/Não foi possível concluir/);
-  assert.equal(p.nodes.get('#refs').children.length,1);assert.match(p.nodes.get('#refs').children[0].textContent,/Filme de referência/);
-});
+function profile(){const f=film(1,'Filme de referência (2000)');return {mensagem:'Pronto',assistidos:[f],referencias:[f],recomendacoes:[]};}
+
+
 
 const tick=()=>new Promise(r=>setImmediate(r));
 async function confirmation({fail=false}={}){
@@ -165,8 +149,37 @@ test('UX02 registra navegação mesmo se foco depois volta ao body',async()=>{
  const c=await confirmation();c.p.nodes.get('#titles').focus();c.p.context.document.activeElement=c.p.context.document.body;c.finish();await c.pending;
  assert.equal(c.p.context.document.activeElement,c.p.context.document.body);
 });
-test('UX02 retirada neutra leva ao perfil; falha retorna ao botão',async()=>{
- let failed=false;const p=fullPage({response:profile(),requestHandler:d=>{if(failed&&d.acao==='remover_referencia')throw Error('falha');return profile();}});await tick();
- let remove=p.nodes.get('#refs').children[0].children.find(e=>e.tagName==='details').children[1];remove.focus();await remove.onclick();assert.equal(p.context.document.activeElement,p.nodes.get('#profile-title'));
- remove=p.nodes.get('#refs').children[0].children.find(e=>e.tagName==='details').children[1];failed=true;remove.focus();await remove.onclick();assert.equal(p.context.document.activeElement,remove);
+
+
+test('título brasileiro é exibido com original e mantém ID ao selecionar',()=>{
+ const w=setup();const f={...film(42,'Original (2000)'),titulo_br:'Nome Brasileiro (2000)',titulo_original:'Original (2000)'};
+ results(w,[f]);
+ const text=w.list.children[0].children[1];
+ assert.equal(text.textContent,'Nome Brasileiro (2000)');
+ assert.equal(text.children[0].textContent,'Original (2000)');
+ w.input.emit('keydown',{key:'ArrowDown'});w.input.emit('keydown',{key:'Enter'});
+ assert.equal(w.widget.items[0].movieId,42);
+ assert.equal(w.widget.items[0].titulo,'Original (2000)');
+ assert.match(w.selected.children[0].children[0].textContent,/Nome Brasileiro/);
+});
+
+test('fluxo essencial confirma, mostra sugestões e permite nova seleção',async()=>{
+ const empty={mensagem:'Selecione filmes',assistidos:[],referencias:[],recomendacoes:[]};
+ const ref=film(1,'Referência (2000)');
+ const rec={...film(2,'Sugestão (2001)'),generos:'Drama',nota_media_treino:4,avaliacoes_treino:5,motivo:'Gênero em comum'};
+ const p=fullPage({requestHandler:d=>d.acao==='confirmar_selecao'?{mensagem:'Confirmada',assistidos:[ref],referencias:[ref],recomendacoes:[rec]}:empty});
+ await tick();vm.runInContext('autocomplete.items=[{movieId:1,titulo:"Referência (2000)"}]',p.context);
+ await p.nodes.get('#search').onsubmit({preventDefault(){}});
+ assert.equal(p.calls.at(-1).acao,'confirmar_selecao');assert.equal(p.nodes.get('#cards').children.length,1);
+ assert.equal(p.nodes.get('#refs').children.length,1);
+ assert.equal(vm.runInContext('autocomplete.items.length',p.context),0);
+ await p.nodes.get('#reset').onclick();
+ assert.equal(p.calls.at(-1).acao,'reiniciar');assert.equal(p.nodes.get('#cards').children.length,0);
+});
+test('pôster aceita URL TMDB válida e falha de imagem retorna ao placeholder',async()=>{
+ const p=fullPage();await tick();
+ const img=vm.runInContext('poster({movieId:1,titulo:"Referência"})',p.context);
+ assert.equal(img.src,'/static/poster-placeholder.svg');
+ img.src='https://image.tmdb.org/t/p/w342/imagem.jpg';img.onerror();
+ assert.equal(img.src,'/static/poster-placeholder.svg');assert.match(img.alt,/indisponível/);
 });

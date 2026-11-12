@@ -1,3 +1,5 @@
+> Registro histórico: streaming foi definitivamente descontinuado em 11/11/2026. Os módulos e rotas aqui descritos não fazem parte do produto atual. Consulte [encerramento de escopo](../docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md).
+
 # RF-02E1 — Catálogo e homologação visual
 
 Atividade realizada com auxílio do Codex em 30/10/2026. Nenhuma chamada autenticada TMDB, disponibilidade de filme, instalação ou ativação externa foi realizada.

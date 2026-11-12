@@ -34,7 +34,17 @@ class MovieAutocomplete {
     this.results.forEach((film,index)=>{
       const option=this.list.ownerDocument.createElement('li');option.id=this.list.id+'-'+index;option.setAttribute('role','option');option.setAttribute('aria-selected','false');
       option.append(this.poster(film,true));
-      const text=this.list.ownerDocument.createElement('span');text.textContent=film.titulo+(film.ano&&!film.titulo.includes('('+film.ano+')')?' ('+film.ano+')':'')+(film.correspondencia==='aproximada'?' · título aproximado':'');option.append(text);
+      const text=this.list.ownerDocument.createElement('span');
+      const title=film.titulo_br||film.titulo;
+      const year=film.ano&&!title.includes('('+film.ano+')')?' ('+film.ano+')':'';
+      text.textContent=title+year+(film.correspondencia==='aproximada'?' · título aproximado':'');
+      if(film.titulo_br&&film.titulo_original){
+        const original=this.list.ownerDocument.createElement('small');
+        original.className='original-title';
+        original.textContent=film.titulo_original;
+        text.append(original);
+      }
+      option.append(text);
       option.addEventListener('pointerdown',e=>e.preventDefault());
       option.addEventListener('click',()=>this.choose(index));this.list.append(option);
     });
@@ -59,13 +69,14 @@ class MovieAutocomplete {
     if(this.items.some(f=>f.movieId===film.movieId)||this.existing().some(f=>f.movieId===film.movieId)){
       this.status.textContent='Esse filme já está selecionado ou registrado como assistido.';this.input.focus();return;
     }
+    if(this.items.length>=5){this.status.textContent='Você já selecionou cinco filmes. Remova um antes de escolher outro.';this.input.focus();return;}
     this.items.push(film);this.dismiss();this.results=[];this.input.value='';this.renderSelection();this.status.textContent=film.titulo+' adicionado. Você pode inserir outro filme ou confirmar a seleção.';this.input.focus();
   }
   renderSelection(){
-    this.selected.replaceChildren();const slots=Math.max(0,5-this.references().length);
+    this.selected.replaceChildren();
     this.items.forEach((film,index)=>{
       const li=this.selected.ownerDocument.createElement('li');
-      const text=this.selected.ownerDocument.createElement('span');text.textContent=film.titulo+' · '+(index<slots?'Referência ao confirmar':'Excedente: assistido fora do perfil');
+      const text=this.selected.ownerDocument.createElement('span');text.textContent=(film.titulo_br||film.titulo)+' · '+'Referência ao confirmar';
       const remove=this.selected.ownerDocument.createElement('button');remove.type='button';remove.textContent='Remover';remove.setAttribute('aria-label','Remover '+film.titulo+' da seleção');
       remove.onclick=()=>{this.items=this.items.filter(f=>f.movieId!==film.movieId);this.renderSelection();this.status.textContent=film.titulo+' removido da seleção a confirmar.';this.input.focus();};li.append(text,remove);this.selected.append(li);
     });

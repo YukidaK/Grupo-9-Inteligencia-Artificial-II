@@ -1,3 +1,5 @@
+> Registro histórico: streaming foi definitivamente descontinuado em 11/11/2026. Os módulos e rotas aqui descritos não fazem parte do produto atual. Consulte [encerramento de escopo](../docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md).
+
 # RF-02A — Contrato interno de disponibilidade
 
 O contrato RF-02A está em `disponibilidade.py`, sem transporte HTTP padrão, leitura de token, endpoints ou dependência do recomendador. A RF-02B acrescenta o cliente isolado [TRANSPORTE_TMDB.md](TRANSPORTE_TMDB.md), desativado por padrão. A RF-02C prepara [FILTRO_STREAMING.md](FILTRO_STREAMING.md) somente em fluxo interno. Não há seleção de streaming na página nem filtragem pública; RF-02D e Etapa 5 permanecem pausadas.

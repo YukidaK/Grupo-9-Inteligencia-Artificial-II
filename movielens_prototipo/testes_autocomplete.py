@@ -56,15 +56,14 @@ class Autocomplete(unittest.TestCase):
         self.assertEqual(len(r),8)
         self.assertEqual(len({f['movieId'] for f in r}),8)
 
-    def test_confirmacao_nao_depende_da_ultima_busca(self):
+    def test_confirmacao_preserva_ids_e_exige_no_maximo_cinco(self):
         conversa, sessao = Conversa(fixture()), Sessao()
-        # Outra busca ou aba não invalida os IDs já selecionados pelo autocomplete.
-        conversa.executar(sessao, {'acao':'buscar','texto':'Solaris'})
-        d = conversa.executar(sessao, {'acao':'confirmar_selecao','ids':[3,3,4,5,6,7,8]})
-        self.assertEqual(sessao.referencias,[3,4,5,6,7])
-        self.assertEqual(sessao.assistidos,[3,4,5,6,7,8])
-        self.assertEqual([f['movieId'] for f in d['excedentes']],[8])
-        self.assertFalse(set(f['movieId'] for f in d['recomendacoes']) & set(sessao.assistidos))
+        with self.assertRaises(ValueError):
+            conversa.executar(sessao, {'acao':'confirmar_selecao','ids':[3,4,5,6,7,8]})
+        self.assertEqual(sessao.assistidos, [])
+        d = conversa.executar(sessao, {'acao':'confirmar_selecao','ids':[3,3,4,5]})
+        self.assertEqual(sessao.referencias,[3,4,5])
+        self.assertFalse(set(sessao.assistidos) & {r['movieId'] for r in d['recomendacoes']})
         with self.assertRaises(ValueError):
             conversa.executar(sessao, {'acao':'confirmar_selecao','ids':[999]})
 
@@ -75,12 +74,12 @@ class Autocomplete(unittest.TestCase):
                 self.saida=bytearray()
             def makefile(self,*args):return self.entrada
             def sendall(self,dados):self.saida.extend(dados)
-        sessao=Sessao(pendentes={3})
+        sessao=Sessao(referencias=[3])
         with patch.object(Handler,'modelo',fixture()),patch.object(Handler,'sessoes',{'teste':(sessao,0)}):
             t=Transporte();Handler(t,('127.0.0.1',1234),object())
             dados=json.loads(bytes(t.saida).split(b'\r\n\r\n')[1])
             self.assertEqual(len(dados['sugestoes']),2)
-            self.assertEqual(sessao.pendentes,{3})
+            self.assertEqual(sessao.referencias,[3])
             self.assertEqual(len(Handler.sessoes),1)
 
     @unittest.skipUnless(shutil.which('node'), 'Node.js não disponível para os testes JavaScript; aplicação não depende dele.')
@@ -88,6 +87,103 @@ class Autocomplete(unittest.TestCase):
         p=Path(__file__).with_name('testes_autocomplete.cjs')
         r=subprocess.run([shutil.which('node'),'--test',str(p)],capture_output=True,text=True,timeout=30)
         self.assertEqual(r.returncode,0,r.stdout+'\n'+r.stderr)
+
+
+
+class TitulosBrasileiros(unittest.TestCase):
+    def setUp(self):
+        from titulos_alternativos import validar_aliases
+        self.filmes = pd.DataFrame([
+            (1, 'Original One (2000)', 'Drama'),
+            (2, 'Original Two (2010)', 'Drama'),
+            (3, 'No Translation (1990)', 'Comedy'),
+        ], columns=['movieId','title','genres'])
+        self.links = {1: 101, 2: 102}
+        self.doc = {'esquema':'cinematch.titulos','versao':1,'idioma':'pt-BR','filmes':[
+            dict(movieId=i,tmdbId=self.links[i],titulo_catalogo=self.filmes.iloc[i-1].title,
+                 ano=y,titulo_br='Título Brasileiro',alternativos=['Outro Nome', 'Título Brasileiro'],
+                 fonte='https://example.org/fixture',verificado_em='2026-11-11')
+            for i,y in ((1,2000),(2,2010))
+        ]}
+        self.validar = validar_aliases
+        self.busca = BuscaCatalogo(self.filmes, self.validar(self.doc,self.filmes,self.links))
+
+    def test_original_br_acentos_caixa_e_ano(self):
+        self.assertEqual(self.busca.buscar('Original One')[0]['movieId'],1)
+        for q in ('TÍTULO BRASILEIRO','titulo brasileiro','Outro Nome'):
+            self.assertEqual({f['movieId'] for f in self.busca.buscar(q)},{1,2})
+        self.assertEqual([f['movieId'] for f in self.busca.buscar('titulo brasileiro (2010)')],[2])
+        self.assertEqual(self.busca.buscar('Original One')[0]['titulo'],'Original One (2000)')
+        self.assertEqual(self.busca.buscar('Original One')[0]['titulo_br'],'Título Brasileiro (2000)')
+
+    def test_ausencia_traducao_e_nao_duplicar(self):
+        self.assertNotIn('titulo_br',self.busca.buscar('No Translation')[0])
+        self.assertEqual(len(self.busca.buscar('Outro Nome')),2)
+        self.assertEqual(len(self.busca.buscar('titulo brasileiro')),2)
+
+    def test_associacoes_invalidas(self):
+        from copy import deepcopy
+        for campo,valor in [('movieId',99),('movieId',True),('tmdbId',999),
+                            ('ano',2001),('titulo_catalogo','Outro filme'),
+                            ('titulo_br',''),('fonte','http://example.org'),('verificado_em','inválida')]:
+            d=deepcopy(self.doc);d['filmes'][0][campo]=valor
+            with self.subTest(campo=campo),self.assertRaises(ValueError):
+                self.validar(d,self.filmes,self.links)
+        d=deepcopy(self.doc);d['filmes'].append(d['filmes'][0])
+        with self.assertRaises(ValueError):self.validar(d,self.filmes,self.links)
+
+    def test_indice_ausente_corrompido_e_falha_de_leitura(self):
+        from titulos_alternativos import carregar_aliases
+        import tempfile
+        with tempfile.TemporaryDirectory() as pasta:
+            p=Path(pasta)/'titulos.json'
+            self.assertEqual(carregar_aliases(self.filmes,self.links,p),{})
+            p.write_text('{invalido')
+            self.assertEqual(carregar_aliases(self.filmes,self.links,p),{})
+            with patch('pathlib.Path.read_text',side_effect=OSError('falha sintética')):
+                self.assertEqual(carregar_aliases(self.filmes,self.links,p),{})
+        # O índice funciona offline sem cliente TMDB.
+        with patch('urllib.request.urlopen',side_effect=AssertionError('Rede proibida')):
+            self.assertTrue(self.busca.buscar('titulo brasileiro'))
+
+    def test_interpretacao_tmdb_exige_pt_br_id_e_titulo_unico(self):
+        from titulos_alternativos import titulo_br_tmdb
+        fixture={'id':101,'translations':[
+            {'iso_639_1':'pt','iso_3166_1':'PT','data':{'title':'Nome Portugal'}},
+            {'iso_639_1':'pt','iso_3166_1':'BR','data':{'title':'Nome Brasileiro'}}]}
+        self.assertEqual(titulo_br_tmdb(fixture,101),'Nome Brasileiro')
+        for payload in (None,{}, {'id':102,'translations':[]},
+                        {'id':101,'translations':[fixture['translations'][0]]}):
+            self.assertIsNone(titulo_br_tmdb(payload,101))
+        fixture['translations'].append({'iso_639_1':'pt','iso_3166_1':'BR','data':{'title':'Conflitante'}})
+        self.assertIsNone(titulo_br_tmdb(fixture,101))
+        with self.assertRaises(ValueError):titulo_br_tmdb({},True)
+
+    def test_endpoint_preserva_id_titulo_e_sessao_com_alias(self):
+        from types import SimpleNamespace
+        from urllib.parse import quote
+        class Transporte:
+            def __init__(self):
+                self.entrada=io.BytesIO(('GET /api/filmes?q='+quote('Título Brasileiro (2000)')+
+                                        ' HTTP/1.0\r\n\r\n').encode())
+                self.saida=bytearray()
+            def makefile(self,*args):return self.entrada
+            def sendall(self,d):self.saida.extend(d)
+        aliases=self.validar(self.doc,self.filmes,self.links)
+        sessao=Sessao(assistidos=[3])
+        with patch.object(Handler,'modelo',SimpleNamespace(filmes=self.filmes)), \
+             patch.object(Handler,'busca_modelo',None),patch.object(Handler,'busca',None), \
+             patch.object(Handler,'sessoes',{'fixture':(sessao,0)}), \
+             patch('app.carregar_links',return_value=self.links), \
+             patch('app.carregar_aliases',return_value=aliases):
+            t=Transporte();Handler(t,('127.0.0.1',1234),object())
+            h,body=bytes(t.saida).split(b'\r\n\r\n',1)
+            self.assertIn(b'200 OK',h)
+            f=json.loads(body)['sugestoes']
+            self.assertEqual([x['movieId'] for x in f],[1])
+            self.assertEqual(f[0]['titulo'],'Original One (2000)')
+            self.assertEqual(f[0]['titulo_br'],'Título Brasileiro (2000)')
+            self.assertEqual(sessao.assistidos,[3])
 
 
 if __name__=='__main__':unittest.main()
