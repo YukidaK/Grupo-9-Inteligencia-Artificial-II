@@ -1,6 +1,10 @@
 # Títulos brasileiros na pesquisa
 
-## Implementação e cobertura
+## Implementação e cobertura atual
+
+**Atualização de 13/11/2026:** o índice passou de três para **30 filmes**, com 27 inclusões manuais verificadas em páginas brasileiras de Apple TV, Disney e HBO Max. São 30 de 9.742 filmes (aproximadamente 0,308%); 9.712 permanecem sem alias brasileiro cadastrado. Cada entrada registra a URL consultada e a data. Não houve consulta autenticada ao TMDB, coleta do piloto ou alteração do MovieLens. Para usar o novo índice, reinicie `app.py`: a busca é mantida em memória por processo.
+
+O histórico abaixo descreve a cobertura anterior; a relação completa atual está ao final deste documento.
 
 A pesquisa usa um índice auxiliar local em `titulos_br.json`, esquema `cinematch.titulos`, versão 1. Cada registro contém movieId, tmdbId, título exato do catálogo, ano, título brasileiro, lista de alternativas, URL de fonte e data de verificação. O MovieLens continua sendo o catálogo de identidade e avaliações.
 
@@ -32,7 +36,7 @@ O Handler reutiliza `carregar_links()` e fornece o índice validado a `BuscaCata
 
 `GET /api/filmes` conserva movieId, titulo, ano, generos e correspondencia. Quando houver alias validado, acrescenta `titulo_br`, incluindo ano, e `titulo_original`, contendo o título MovieLens original. O valor legado `titulo` é preservado. O autocomplete mostra o brasileiro na primeira linha e o nome do catálogo abaixo, usando nós de texto. As confirmações continuam enviando os IDs existentes.
 
-A preferência visual brasileira aplica-se às sugestões e à seleção a confirmar. O perfil, o histórico retornado pelo backend e as recomendações mantêm os títulos do catálogo. A conversa por comandos continua utilizando seu próprio interpretador. Esta etapa cobre o campo de pesquisa e não expande o reconhecimento de títulos pela conversa.
+A preferência visual brasileira aplica-se às sugestões e à seleção a confirmar. O perfil, o histórico retornado pelo backend e as recomendações mantêm os títulos do catálogo. Esta funcionalidade cobre o campo de pesquisa. A conversa por comandos foi descontinuada no escopo final.
 
 Nenhuma alteração foi feita no recomendador, no treino/teste, nas métricas, nos CSVs ou no cache de pôsteres. Os módulos exportados pelo notebook permanecem intactos, portanto esta mudança não exige sincronizar suas cópias incorporadas.
 
@@ -144,3 +148,54 @@ A próxima expansão depende de concluir os requisitos de uso externo, executar 
 ## Decisão de escopo final — 11/11/2026
 
 A expansão foi retirada das prioridades. O piloto e seu checkpoint foram preservados sem executar as 98 consultas pendentes. Os três aliases homologados continuam sendo a única cobertura pública. Não há coleta na inicialização nem durante a digitação. Os resultados e comandos acima documentam a etapa anterior, sem constituir autorização de coleta futura.
+
+## Expansão manual de 13/11/2026
+
+O nome brasileiro foi conferido na página regional da fonte. O registro de origem foi associado ao título/ano exatos de `movies.csv`; o identificador TMDB foi obtido exclusivamente de `links.csv`, sem busca aproximada de IDs. Nenhuma sinopse, imagem ou oferta foi copiada. Essas páginas servem como evidência do nome, não como confirmação de disponibilidade em assinatura nem como autorização geral de uso de outros materiais. Os direitos das fontes continuam preservados.
+
+A ampliação é uma curadoria limitada, não tradução automática nem cobertura completa do catálogo. O piloto antigo continua preservado com seu checkpoint original; o índice mudou, portanto sua retomada exigirá revisão de procedência/novo planejamento, sem alterar os hashes antigos. Não foi executada coleta de títulos pendentes.
+
+| movieId | TMDB | Título brasileiro | Fonte |
+|---|---|---|---|
+| 858 | 238 | O Poderoso Chefão | [Página de referência](https://tv.apple.com/br/movie/o-poderoso-chefao/umc.cmc.3ew9fykdnpfaq9t2jq5da011c) |
+| 318 | 278 | Um Sonho de Liberdade | [Página de referência](https://www.hbomax.com/br/pt/movie/9b4dacba-2f80-4272-aac7-bb5e2ae91343) |
+| 3147 | 497 | À Espera de um Milagre | [Página de referência](https://tv.apple.com/br/movie/a-espera-de-um-milagre/umc.cmc.7hcm0jk7o0ko95ghs171h7v41) |
+| 1270 | 105 | De Volta Para o Futuro | [Página de referência](https://tv.apple.com/br/movie/de-volta-para-o-futuro/umc.cmc.1alygfljzpxrofhgpoa6mmjnb) |
+| 356 | 13 | Forrest Gump, o Contador de Histórias | [Página de referência](https://tv.apple.com/br/movie/forrest-gump-o-contador-de-historias/umc.cmc.5ov9f55aw8qvmd5pumhgnwu3e) |
+| 364 | 8587 | O Rei Leão | [Página de referência](https://tv.apple.com/br/movie/o-rei-leao/umc.cmc.hzw12vgjjoz0tf0jn5m0x8i4) |
+| 2959 | 550 | Clube da Luta | [Página de referência](https://tv.apple.com/br/movie/clube-da-luta/umc.cmc.70dbl3043tb6ealg0u12k1pih) |
+| 79132 | 27205 | A Origem | [Página de referência](https://tv.apple.com/br/movie/a-origem/umc.cmc.6loas01ow0w4lkatxxloz7a6e) |
+| 109487 | 157336 | Interestelar | [Página de referência](https://tv.apple.com/br/movie/interestelar/umc.cmc.1vrwat5k1ucm5k42q97ioqyq3) |
+| 58559 | 155 | Batman: O Cavaleiro das Trevas | [Página de referência](https://tv.apple.com/br/movie/batman-o-cavaleiro-das-trevas/umc.cmc.1uf4c3neuc9yxhnjv7t4rd5wa) |
+| 5952 | 121 | O Senhor dos Anéis: As Duas Torres | [Página de referência](https://tv.apple.com/br/movie/o-senhor-dos-aneis-as-duas-torres/umc.cmc.3j5r5wkkga96efci96q1kgjhi) |
+| 7153 | 122 | O Senhor dos Anéis: O Retorno do Rei | [Página de referência](https://tv.apple.com/br/movie/o-senhor-dos-aneis-o-retorno-do-rei/umc.cmc.57s6i23z9ry0zsgwwc2mxjqi6) |
+| 4993 | 120 | O Senhor dos Anéis: A Sociedade do Anel | [Página de referência](https://www.hbomax.com/br/pt/movie/fb9f961f-6302-4776-91d7-f1b7a69fb61d) |
+| 4896 | 671 | Harry Potter e a Pedra Filosofal | [Página de referência](https://tv.apple.com/br/movie/harry-potter-e-a-pedra-filosofal/umc.cmc.55wxtmrughu40phd8lgr6qejr) |
+| 527 | 424 | A Lista de Schindler | [Página de referência](https://tv.apple.com/br/movie/a-lista-de-schindler/umc.cmc.53hzoo3z0ufjb6wsxgspp2jlf) |
+| 2028 | 857 | O Resgate do Soldado Ryan | [Página de referência](https://tv.apple.com/br/movie/o-resgate-do-soldado-ryan/umc.cmc.42f75umn5z16fkpofphe4re85) |
+| 589 | 280 | O Exterminador do Futuro 2: O Julgamento Final | [Página de referência](https://tv.apple.com/br/movie/o-exterminador-do-futuro-2-o-julgamento-final/umc.cmc.1zt8xklrl4a6zim4n4iq2qyp2) |
+| 6377 | 12 | Procurando Nemo | [Página de referência](https://tv.apple.com/br/movie/procurando-nemo/umc.cmc.6mbogy74hds0btkz7rj83hzhq) |
+| 8961 | 9806 | Os Incríveis | [Página de referência](https://www.disneyplus.com/pt-br/browse/entity-850b6e92-07ea-4211-b3c3-cbbf1de045fa) |
+| 3578 | 98 | Gladiador | [Página de referência](https://tv.apple.com/br/movie/gladiador/umc.cmc.50lk1pxm803ym8vizumxitxd2) |
+| 7361 | 38 | Brilho Eterno de uma Mente sem Lembranças | [Página de referência](https://tv.apple.com/br/movie/brilho-eterno-de-uma-mente-sem-lembrancas/umc.cmc.4sao10xsyfeqf1t185lhrvo65) |
+| 6539 | 22 | Piratas do Caribe: A Maldição do Pérola Negra | [Página de referência](https://www.disneyplus.com/pt-br/browse/entity-2d6036d7-f3b4-42c3-b1d3-cd5dd79bf307) |
+| 2762 | 745 | O Sexto Sentido | [Página de referência](https://www.disneyplus.com/pt-br/browse/entity-219a5dfc-1b65-4644-9415-044c7d3a425d) |
+| 586 | 771 | Esqueceram de Mim | [Página de referência](https://www.disney.com.br/novidades/onde-ver-online-todos-os-filmes-de-esqueceram-de-mim) |
+| 2671 | 509 | Um Lugar Chamado Notting Hill | [Página de referência](https://tv.apple.com/br/movie/um-lugar-chamado-notting-hill/umc.cmc.3qn8yq9tq2vm3zizigtmls0ou) |
+| 5816 | 672 | Harry Potter e a Câmara Secreta | [Página de referência](https://tv.apple.com/br/movie/harry-potter-e-a-camara-secreta/umc.cmc.69sq804vqp3dy39oxiajnr3ux) |
+| 8368 | 673 | Harry Potter e o Prisioneiro de Azkaban | [Página de referência](https://www.hbomax.com/br/pt/movie/73553a76-1658-45f6-9e26-1b9c4443b0d6) |
+| 68954 | 14160 | Up - Altas Aventuras | [Página de referência](https://tv.apple.com/br/movie/up---altas-aventuras/umc.cmc.7hyl1e1p1ihe8aiij3fzjwwyc) |
+| 50872 | 2062 | Ratatouille | [Página de referência](https://tv.apple.com/br/movie/ratatouille/umc.cmc.2i8p6l6cpu6zxmcpqao7bs147) |
+| 4886 | 585 | Monstros S.A. | [Página de referência](https://tv.apple.com/br/movie/monstros-sa/umc.cmc.3ilsdzy6ghi4adtg3tnwf6jcb) |
+
+### Verificações desta ampliação
+
+Em 13/11/2026 foram executados:
+
+- `.venv/bin/python -B -m unittest discover -s movielens_prototipo -p testes.py`: **209 aprovados**, zero falhas e zero ignorados.
+- `node --test --test-isolation=none movielens_prototipo/testes_autocomplete.cjs`: **19 aprovados**, zero falhas e zero ignorados.
+- Validação estrita das 30 entradas contra o catálogo MovieLens e `links.csv`, seguida de 30 pesquisas pelo título brasileiro completo: todas retornaram o `movieId` esperado em primeiro lugar.
+- Os três registros anteriores foram preservados integralmente. A comparação SHA-256 de 81 arquivos protegidos de dados, resultados, experimentos, reprodução e componentes compartilhados encontrou zero divergências.
+- `git diff --check`: aprovado. Não houve novo teste visual, consulta autenticada, commit ou push nesta ampliação.
+
+Foram acrescentados três testes do índice público em memória, sem exigir avaliações reais: novos nomes sem acentos/caixa, títulos originais/ano/referências anteriores e distinção entre obras das franquias. Os demais testes de ambiguidades, IDs inválidos e indisponibilidade da fonte permanecem na suíte. Os registros locais estão em `verificacoes/aliases_br_20261113/`, ignorados pelo Git.

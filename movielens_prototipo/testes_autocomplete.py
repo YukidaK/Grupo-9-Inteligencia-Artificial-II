@@ -187,3 +187,43 @@ class TitulosBrasileiros(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
+
+class CatalogoBrasileiroLocal(unittest.TestCase):
+    """Índice público de nomes, exercitado sem CSVs de avaliações nem rede."""
+    def setUp(self):
+        from titulos_alternativos import validar_aliases
+        self.doc=json.loads(Path(__file__).with_name('titulos_br.json').read_text(encoding='utf-8'))
+        # Catálogo mínimo em memória; nenhum dado de avaliação é necessário.
+        filmes=pd.DataFrame([(f['movieId'],f['titulo_catalogo'],'Drama') for f in self.doc['filmes']],
+                            columns=['movieId','title','genres'])
+        links={f['movieId']:f['tmdbId'] for f in self.doc['filmes']}
+        self.busca=BuscaCatalogo(filmes,validar_aliases(self.doc,filmes,links))
+
+    def test_novos_nomes_retornam_ids_esperados_offline(self):
+        casos={'o rei leao':364,'CLUBE DA LUTA':2959,'a origem':79132,'interestelar':109487,
+               'de volta para o futuro':1270,'procurando nemo':6377,'os incriveis':8961,
+               'monstros sa':4886,'harry potter e a camara secreta':5816,
+               'harry potter e o prisioneiro de azkaban':8368,'altas aventuras':68954,
+               'a sociedade do anel':4993,'as duas torres':5952,'o retorno do rei':7153,
+               'o resgate do soldado ryan':2028,'a lista de schindler':527,
+               'esqueceram de mim':586,'brilho eterno de uma mente sem lembrancas':7361}
+        with patch('urllib.request.urlopen',side_effect=AssertionError('Pesquisa deve ser offline')):
+            for texto,mid in casos.items():
+                with self.subTest(texto=texto):
+                    sugestoes=self.busca.buscar(texto)
+                    self.assertEqual(sugestoes[0]['movieId'],mid)
+                    self.assertEqual(len({f['movieId'] for f in sugestoes}),len(sugestoes))
+
+    def test_origem_ano_e_referencias_anteriores_preservados(self):
+        for texto,mid in [('O Poderoso Chefão',858),('Um Sonho de Liberdade',318),
+                          ('À Espera de um Milagre',3147),('The Lion King',364),
+                          ('Fight Club (1999)',2959),('De Volta Para o Futuro (1985)',1270)]:
+            with self.subTest(texto=texto):self.assertEqual(self.busca.buscar(texto)[0]['movieId'],mid)
+        self.assertEqual(self.busca.buscar('O Rei Leão (2019)'),[])
+        self.assertIn('Lion King',self.busca.buscar('O Rei Leão')[0]['titulo_original'])
+
+    def test_familia_de_titulos_mantem_obras_distintas(self):
+        self.assertEqual({r['movieId'] for r in self.busca.buscar('Harry Potter')},{4896,5816,8368})
+        self.assertEqual({r['movieId'] for r in self.busca.buscar('O Senhor dos Anéis')},{4993,5952,7153})
+        self.assertLessEqual(len(self.busca.buscar('o ')),8)

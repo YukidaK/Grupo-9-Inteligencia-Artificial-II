@@ -37,7 +37,7 @@ Os IDs MovieLens continuam públicos no caminho legado. `identidades.py` disting
 
 ## Pesquisa por títulos brasileiros
 
-O autocomplete pesquisa aliases locais associados aos IDs MovieLens, com apresentação brasileira quando cadastrada. A cobertura inicial é de três filmes. Consulte [Títulos brasileiros](TITULOS_BR.md) para fontes, validação e limites.
+O autocomplete pesquisa aliases locais associados aos IDs MovieLens, com apresentação brasileira quando cadastrada. A cobertura atual é de 30 filmes, ampliada manualmente em 13/11/2026. Consulte [Títulos brasileiros](TITULOS_BR.md) para fontes, validação e limites.
 
 ## Pôsteres e dependências preservadas
 
@@ -77,4 +77,4 @@ Streaming e refinamento interativo foram descontinuados. Não há item–item na
 
 ## Estabilização do escopo final
 
-Consulte o [relatório de encerramento](../docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md). O piloto de títulos de 100 filmes foi preservado, sem executar as 98 consultas pendentes. A pesquisa com os três aliases funciona localmente. Sem credencial TMDB, o pôster usa o placeholder; testes simulados não homologam a API real. O notebook histórico não deve exportar seus módulos antigos sobre a aplicação atual; utilize uma cópia isolada.
+Consulte o [relatório de encerramento](../docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md). O piloto de títulos de 100 filmes foi preservado, sem executar as 98 consultas pendentes. A pesquisa com os 30 títulos cadastrados funciona localmente. Sem credencial TMDB, o pôster usa o placeholder; testes simulados não homologam a API real. O notebook histórico não deve exportar seus módulos antigos sobre a aplicação atual; utilize uma cópia isolada.

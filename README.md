@@ -29,7 +29,7 @@ A página utiliza um recomendador baseado em gêneros: compara os gêneros dos f
 
 - De uma a cinco referências ativas; sem referências, não há recomendação personalizada.
 - Até dez recomendações, excluindo o histórico conhecido; busca e autocomplete.
-- Seleção de filmes pelo título original ou pelos três aliases brasileiros homologados; remoção de escolhas antes da confirmação e opção de começar novamente.
+- Seleção de filmes pelo título original ou pelos 30 títulos brasileiros cadastrados; remoção de escolhas antes da confirmação e opção de começar novamente.
 - Sessões temporárias em memória, sem login ou banco de dados.
 - Pôsteres opcionais por TMDB, com cache local e placeholder quando indisponíveis. A execução básica não exige credenciais.
 - Sem seleção de streaming, comandos de conversa ou feedback posterior às recomendações.
@@ -91,4 +91,4 @@ Fonte: MovieLens/GroupLens; referência e condições em [DATASET.md](docs/DATAS
 
 ## Estabilização do escopo final
 
-Consulte o [relatório de encerramento](docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md). O piloto de títulos de 100 filmes foi preservado, sem executar as 98 consultas pendentes. A pesquisa com os três aliases funciona localmente. Sem credencial TMDB, o pôster usa o placeholder; testes simulados não homologam a API real. O notebook histórico não deve exportar seus módulos antigos sobre a aplicação atual; utilize uma cópia isolada.
+Consulte o [relatório de encerramento](docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md). O piloto de títulos de 100 filmes foi preservado, sem executar as 98 consultas pendentes. A pesquisa com os 30 títulos cadastrados funciona localmente. Sem credencial TMDB, o pôster usa o placeholder; testes simulados não homologam a API real. O notebook histórico não deve exportar seus módulos antigos sobre a aplicação atual; utilize uma cópia isolada.
