@@ -9,11 +9,11 @@ from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 from recomendador import carregar_modelo
 from conversa import Conversa, Sessao
-from posteres import Posteres, PLACEHOLDER
+from posteres import Posteres, PLACEHOLDER, carregar_links
+from titulos_alternativos import carregar_aliases
 from busca import BuscaCatalogo
 from estado_sessao import EstadoSessao
 from operacao_externa import TravaRegistro
-from streaming_web import executar_streaming, CATALOGO_BR
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -24,7 +24,6 @@ class Handler(BaseHTTPRequestHandler):
     sessoes = {}
     trava = TravaRegistro()
     _estados = {}
-    catalogo_streaming = CATALOGO_BR
 
     def _sessao_atual(self):
         """Chamar sob trava; preserva cookie e expiração anteriores."""
@@ -63,14 +62,16 @@ class Handler(BaseHTTPRequestHandler):
                 consulta = parse_qs(urlparse(self.path).query).get('q', [''])[0]
                 with self.trava:
                     if self.busca_modelo is not self.modelo:
-                        type(self).busca = BuscaCatalogo(self.modelo.filmes)
+                        links = carregar_links(Path(__file__).with_name('dados') / 'ml-latest-small' / 'links.csv')
+                        aliases = carregar_aliases(self.modelo.filmes, links)
+                        type(self).busca = BuscaCatalogo(self.modelo.filmes, aliases)
                         type(self).busca_modelo = self.modelo
                     busca = self.busca
                 resultado = busca.buscar(consulta)
                 self.responder(200, json.dumps({'sugestoes': resultado}, ensure_ascii=False).encode(), 'application/json; charset=utf-8')
             except ValueError as erro:
                 self.responder(400, json.dumps({'erro': str(erro)}).encode(), 'application/json; charset=utf-8')
-        elif caminho in ('/static/autocomplete.js','/static/streaming.js'):
+        elif caminho == '/static/autocomplete.js':
             self.responder(200, Path(__file__).with_name('static').joinpath(caminho.rsplit('/',1)[1]).read_bytes(), 'text/javascript; charset=utf-8')
         elif caminho == PLACEHOLDER:
             self.responder(200, Path(__file__).with_name('static').joinpath('poster-placeholder.svg').read_bytes(), 'image/svg+xml')
@@ -85,7 +86,7 @@ class Handler(BaseHTTPRequestHandler):
             self.responder(404, b'Nao encontrado', 'text/plain; charset=utf-8')
 
     def do_POST(self):
-        if self.path not in ('/api/recomendar','/api/streaming'):
+        if self.path != '/api/recomendar':
             self.responder(404, b'{}', 'application/json')
             return
         try:
@@ -105,8 +106,7 @@ class Handler(BaseHTTPRequestHandler):
                     estado=EstadoSessao(sessao);self._estados[sid]=estado
                 estado.ativos+=1
             try:
-                resposta=estado.executar(lambda s:(executar_streaming(s,dados,self.catalogo_streaming)
-                    if self.path=='/api/streaming' else Conversa(self.modelo).executar(s,dados)),
+                resposta=estado.executar(lambda s:Conversa(self.modelo).executar(s,dados),
                     mutacao=dados.get('acao')!='estado')
             finally:
                 with self.trava:

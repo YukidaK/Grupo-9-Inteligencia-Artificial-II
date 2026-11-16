@@ -1,0 +1,308 @@
+{
+  "esquema": "cinematch.titulos",
+  "versao": 1,
+  "idioma": "pt-BR",
+  "procedimento": "curadoria manual de título comercial e ano, com IDs conferidos em movies.csv e links.csv; sem resposta autenticada TMDB",
+  "filmes": [
+    {
+      "movieId": 858,
+      "tmdbId": 238,
+      "titulo_catalogo": "Godfather, The (1972)",
+      "ano": 1972,
+      "titulo_br": "O Poderoso Chefão",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/o-poderoso-chefao/umc.cmc.3ew9fykdnpfaq9t2jq5da011c",
+      "verificado_em": "2026-11-11"
+    },
+    {
+      "movieId": 318,
+      "tmdbId": 278,
+      "titulo_catalogo": "Shawshank Redemption, The (1994)",
+      "ano": 1994,
+      "titulo_br": "Um Sonho de Liberdade",
+      "alternativos": [],
+      "fonte": "https://www.hbomax.com/br/pt/movie/9b4dacba-2f80-4272-aac7-bb5e2ae91343",
+      "verificado_em": "2026-11-11"
+    },
+    {
+      "movieId": 3147,
+      "tmdbId": 497,
+      "titulo_catalogo": "Green Mile, The (1999)",
+      "ano": 1999,
+      "titulo_br": "À Espera de um Milagre",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/a-espera-de-um-milagre/umc.cmc.7hcm0jk7o0ko95ghs171h7v41",
+      "verificado_em": "2026-11-11"
+    },
+    {
+      "movieId": 1270,
+      "tmdbId": 105,
+      "titulo_catalogo": "Back to the Future (1985)",
+      "ano": 1985,
+      "titulo_br": "De Volta Para o Futuro",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/de-volta-para-o-futuro/umc.cmc.1alygfljzpxrofhgpoa6mmjnb",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 356,
+      "tmdbId": 13,
+      "titulo_catalogo": "Forrest Gump (1994)",
+      "ano": 1994,
+      "titulo_br": "Forrest Gump, o Contador de Histórias",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/forrest-gump-o-contador-de-historias/umc.cmc.5ov9f55aw8qvmd5pumhgnwu3e",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 364,
+      "tmdbId": 8587,
+      "titulo_catalogo": "Lion King, The (1994)",
+      "ano": 1994,
+      "titulo_br": "O Rei Leão",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/o-rei-leao/umc.cmc.hzw12vgjjoz0tf0jn5m0x8i4",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 2959,
+      "tmdbId": 550,
+      "titulo_catalogo": "Fight Club (1999)",
+      "ano": 1999,
+      "titulo_br": "Clube da Luta",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/clube-da-luta/umc.cmc.70dbl3043tb6ealg0u12k1pih",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 79132,
+      "tmdbId": 27205,
+      "titulo_catalogo": "Inception (2010)",
+      "ano": 2010,
+      "titulo_br": "A Origem",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/a-origem/umc.cmc.6loas01ow0w4lkatxxloz7a6e",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 109487,
+      "tmdbId": 157336,
+      "titulo_catalogo": "Interstellar (2014)",
+      "ano": 2014,
+      "titulo_br": "Interestelar",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/interestelar/umc.cmc.1vrwat5k1ucm5k42q97ioqyq3",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 58559,
+      "tmdbId": 155,
+      "titulo_catalogo": "Dark Knight, The (2008)",
+      "ano": 2008,
+      "titulo_br": "Batman: O Cavaleiro das Trevas",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/batman-o-cavaleiro-das-trevas/umc.cmc.1uf4c3neuc9yxhnjv7t4rd5wa",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 5952,
+      "tmdbId": 121,
+      "titulo_catalogo": "Lord of the Rings: The Two Towers, The (2002)",
+      "ano": 2002,
+      "titulo_br": "O Senhor dos Anéis: As Duas Torres",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/o-senhor-dos-aneis-as-duas-torres/umc.cmc.3j5r5wkkga96efci96q1kgjhi",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 7153,
+      "tmdbId": 122,
+      "titulo_catalogo": "Lord of the Rings: The Return of the King, The (2003)",
+      "ano": 2003,
+      "titulo_br": "O Senhor dos Anéis: O Retorno do Rei",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/o-senhor-dos-aneis-o-retorno-do-rei/umc.cmc.57s6i23z9ry0zsgwwc2mxjqi6",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 4993,
+      "tmdbId": 120,
+      "titulo_catalogo": "Lord of the Rings: The Fellowship of the Ring, The (2001)",
+      "ano": 2001,
+      "titulo_br": "O Senhor dos Anéis: A Sociedade do Anel",
+      "alternativos": [],
+      "fonte": "https://www.hbomax.com/br/pt/movie/fb9f961f-6302-4776-91d7-f1b7a69fb61d",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 4896,
+      "tmdbId": 671,
+      "titulo_catalogo": "Harry Potter and the Sorcerer's Stone (a.k.a. Harry Potter and the Philosopher's Stone) (2001)",
+      "ano": 2001,
+      "titulo_br": "Harry Potter e a Pedra Filosofal",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/harry-potter-e-a-pedra-filosofal/umc.cmc.55wxtmrughu40phd8lgr6qejr",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 527,
+      "tmdbId": 424,
+      "titulo_catalogo": "Schindler's List (1993)",
+      "ano": 1993,
+      "titulo_br": "A Lista de Schindler",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/a-lista-de-schindler/umc.cmc.53hzoo3z0ufjb6wsxgspp2jlf",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 2028,
+      "tmdbId": 857,
+      "titulo_catalogo": "Saving Private Ryan (1998)",
+      "ano": 1998,
+      "titulo_br": "O Resgate do Soldado Ryan",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/o-resgate-do-soldado-ryan/umc.cmc.42f75umn5z16fkpofphe4re85",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 589,
+      "tmdbId": 280,
+      "titulo_catalogo": "Terminator 2: Judgment Day (1991)",
+      "ano": 1991,
+      "titulo_br": "O Exterminador do Futuro 2: O Julgamento Final",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/o-exterminador-do-futuro-2-o-julgamento-final/umc.cmc.1zt8xklrl4a6zim4n4iq2qyp2",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 6377,
+      "tmdbId": 12,
+      "titulo_catalogo": "Finding Nemo (2003)",
+      "ano": 2003,
+      "titulo_br": "Procurando Nemo",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/procurando-nemo/umc.cmc.6mbogy74hds0btkz7rj83hzhq",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 8961,
+      "tmdbId": 9806,
+      "titulo_catalogo": "Incredibles, The (2004)",
+      "ano": 2004,
+      "titulo_br": "Os Incríveis",
+      "alternativos": [],
+      "fonte": "https://www.disneyplus.com/pt-br/browse/entity-850b6e92-07ea-4211-b3c3-cbbf1de045fa",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 3578,
+      "tmdbId": 98,
+      "titulo_catalogo": "Gladiator (2000)",
+      "ano": 2000,
+      "titulo_br": "Gladiador",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/gladiador/umc.cmc.50lk1pxm803ym8vizumxitxd2",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 7361,
+      "tmdbId": 38,
+      "titulo_catalogo": "Eternal Sunshine of the Spotless Mind (2004)",
+      "ano": 2004,
+      "titulo_br": "Brilho Eterno de uma Mente sem Lembranças",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/brilho-eterno-de-uma-mente-sem-lembrancas/umc.cmc.4sao10xsyfeqf1t185lhrvo65",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 6539,
+      "tmdbId": 22,
+      "titulo_catalogo": "Pirates of the Caribbean: The Curse of the Black Pearl (2003)",
+      "ano": 2003,
+      "titulo_br": "Piratas do Caribe: A Maldição do Pérola Negra",
+      "alternativos": [],
+      "fonte": "https://www.disneyplus.com/pt-br/browse/entity-2d6036d7-f3b4-42c3-b1d3-cd5dd79bf307",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 2762,
+      "tmdbId": 745,
+      "titulo_catalogo": "Sixth Sense, The (1999)",
+      "ano": 1999,
+      "titulo_br": "O Sexto Sentido",
+      "alternativos": [],
+      "fonte": "https://www.disneyplus.com/pt-br/browse/entity-219a5dfc-1b65-4644-9415-044c7d3a425d",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 586,
+      "tmdbId": 771,
+      "titulo_catalogo": "Home Alone (1990)",
+      "ano": 1990,
+      "titulo_br": "Esqueceram de Mim",
+      "alternativos": [],
+      "fonte": "https://www.disney.com.br/novidades/onde-ver-online-todos-os-filmes-de-esqueceram-de-mim",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 2671,
+      "tmdbId": 509,
+      "titulo_catalogo": "Notting Hill (1999)",
+      "ano": 1999,
+      "titulo_br": "Um Lugar Chamado Notting Hill",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/um-lugar-chamado-notting-hill/umc.cmc.3qn8yq9tq2vm3zizigtmls0ou",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 5816,
+      "tmdbId": 672,
+      "titulo_catalogo": "Harry Potter and the Chamber of Secrets (2002)",
+      "ano": 2002,
+      "titulo_br": "Harry Potter e a Câmara Secreta",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/harry-potter-e-a-camara-secreta/umc.cmc.69sq804vqp3dy39oxiajnr3ux",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 8368,
+      "tmdbId": 673,
+      "titulo_catalogo": "Harry Potter and the Prisoner of Azkaban (2004)",
+      "ano": 2004,
+      "titulo_br": "Harry Potter e o Prisioneiro de Azkaban",
+      "alternativos": [],
+      "fonte": "https://www.hbomax.com/br/pt/movie/73553a76-1658-45f6-9e26-1b9c4443b0d6",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 68954,
+      "tmdbId": 14160,
+      "titulo_catalogo": "Up (2009)",
+      "ano": 2009,
+      "titulo_br": "Up - Altas Aventuras",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/up---altas-aventuras/umc.cmc.7hyl1e1p1ihe8aiij3fzjwwyc",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 50872,
+      "tmdbId": 2062,
+      "titulo_catalogo": "Ratatouille (2007)",
+      "ano": 2007,
+      "titulo_br": "Ratatouille",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/ratatouille/umc.cmc.2i8p6l6cpu6zxmcpqao7bs147",
+      "verificado_em": "2026-11-13"
+    },
+    {
+      "movieId": 4886,
+      "tmdbId": 585,
+      "titulo_catalogo": "Monsters, Inc. (2001)",
+      "ano": 2001,
+      "titulo_br": "Monstros S.A.",
+      "alternativos": [],
+      "fonte": "https://tv.apple.com/br/movie/monstros-sa/umc.cmc.3ilsdzy6ghi4adtg3tnwf6jcb",
+      "verificado_em": "2026-11-13"
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+> Registro histórico: streaming foi definitivamente descontinuado em 11/11/2026. Os módulos e rotas aqui descritos não fazem parte do produto atual. Consulte [encerramento de escopo](../docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md).
+
 # RF-02C — Preferências de sessão e filtragem controlada
 
 Somente fluxo interno com dados sintéticos/transporte simulado. O recomendador e o JSON/endpoints/interface atuais não foram alterados. Nenhum ponto de `app.py` ou `Conversa.atualizar()` chama o filtro. O transporte continua desativado por padrão. RF-02D e Etapa 5 pausadas; revisão integral dos termos ainda pendente. Não está pronto para uso externo.

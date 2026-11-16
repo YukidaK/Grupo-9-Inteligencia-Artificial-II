@@ -1,6 +1,17 @@
 # CineMatch
 
-Protótipo acadêmico de recomendação de filmes do curso de Ciência da Computação da FIB. O projeto permite estudar recomendações, conversar para refinar um perfil e comparar métodos em experimentos offline com o MovieLens Latest Small.
+Protótipo acadêmico de recomendação de filmes do curso de Ciência da Computação da FIB. O projeto permite pesquisar filmes, selecionar referências e obter recomendações, além de comparar métodos em experimentos offline com o MovieLens Latest Small.
+
+## Integrantes
+
+| Nome                          | Responsabilidades                          |
+| ----------------------------- | ------------------------------------------ |
+| Cauâ Ferreira Cardoso         | Protótipo web                              |
+| Eduardo Miquéias Melo Sun     | Comunicação e materiais                    |
+| Laura Lopes Húngaro           | Experimentos e análise de erros            |
+| Leidiane Magalhães Silva      | Dados e EDA                                |
+| Matheus Yuuki Okida Kamiya    | Pré-processamento e divisão treino e teste |
+
 
 ## Sistema de recomendação de filmes
 
@@ -8,11 +19,11 @@ Protótipo acadêmico de recomendação de filmes do curso de Ciência da Comput
 
 Em catálogos com milhares de títulos, o usuário pode perder tempo procurando o que assistir. O protótipo recomenda até dez filmes a partir de uma a cinco referências ativas. Com zero referências, não gera recomendações personalizadas. Uma ou duas referências são aceitas com orientação adicional; de três a cinco, segue o fluxo normal. Mais referências não garantem maior precisão.
 
-Público: pessoas que usam serviços de streaming e querem descobrir filmes de acordo com seus interesses, sem precisar entender Machine Learning.
+Público: pessoas que querem descobrir filmes a partir de títulos conhecidos, sem precisar entender aprendizado de máquina.
 
-Entrada: de uma a cinco referências ativas, com preferências de gêneros e refinamento pelos comandos reconhecidos na conversa. Informar que assistiu a um filme não significa necessariamente que gostou dele.
+- Entrada: de uma a cinco referências, escolhidas no autocomplete. É possível remover uma escolha antes de confirmar ou iniciar uma nova seleção.
 
-Saída: até dez recomendações com justificativas. A comparação com os baselines de popularidade e nota ponderada pertence à avaliação experimental; o baseline de popularidade e o item–item experimental não geram as recomendações da página. A seleção de plataformas existe, mas a consulta real de disponibilidade e o filtro por assinatura continuam desativados.
+- Saída: até dez recomendações com justificativas. A comparação com os baselines de popularidade e nota ponderada pertence à avaliação experimental; o baseline de popularidade e o item–item experimental não geram as recomendações da página. Seleção de plataformas, consultas de disponibilidade e refinamento interativo foram definitivamente descontinuados no escopo final.
 
 ### Direitos autorais e utilização
 
@@ -25,16 +36,16 @@ Os direitos dos respectivos autores e as condições de utilização de recursos
 
 ## Funcionamento atual
 
-A página utiliza um recomendador baseado em gêneros: compara os gêneros dos filmes de referência por Jaccard e combina esse sinal com preferências explícitas e nota ponderada calculada no treino. Não utiliza o item–item experimental nem um modelo de linguagem na conversa.
+A página utiliza um recomendador baseado em gêneros: compara os gêneros dos filmes de referência por Jaccard e combina esse sinal com nota ponderada calculada no treino. O componente de preferências permanece vazio no fluxo público; a fórmula original foi preservada. Não utiliza o item–item experimental nem um modelo de linguagem.
 
 - De uma a cinco referências ativas; sem referências, não há recomendação personalizada.
 - Até dez recomendações, excluindo o histórico conhecido; busca e autocomplete.
-- Conversa por regras, preferências de gêneros, rejeição explícita e retirada neutra de referências, preservando o histórico.
+- Seleção de filmes pelo título original ou pelos 30 títulos brasileiros cadastrados; remoção de escolhas antes da confirmação e opção de começar novamente.
 - Sessões temporárias em memória, sem login ou banco de dados.
 - Pôsteres opcionais por TMDB, com cache local e placeholder quando indisponíveis. A execução básica não exige credenciais.
-- Preferências de streaming salvas na sessão. **A disponibilidade real e a filtragem por assinatura estão desativadas; o catálogo brasileiro homologado está vazio.** Selecionar preferências não altera as recomendações atuais.
+- Sem seleção de streaming, comandos de conversa ou feedback posterior às recomendações.
 
-A filtragem colaborativa item–item existe somente como experimento independente. Séries, novos datasets e ativação real de streaming não estão implementados na experiência pública.
+A filtragem colaborativa item–item existe somente como experimento independente. Séries e novos datasets não estão implementados. Streaming não integra o produto final.
 
 ## Tecnologias
 
@@ -64,7 +75,7 @@ No Windows, o executável do ambiente virtual fica em `.venv\Scripts\python.exe`
 
 ```sh
 .venv/bin/python -B -m unittest discover -s movielens_prototipo -p testes.py
-node --test movielens_prototipo/testes_autocomplete.cjs movielens_prototipo/testes_streaming.cjs
+node --test --test-isolation=none movielens_prototipo/testes_autocomplete.cjs
 ```
 
 Node.js é necessário apenas para os testes JavaScript (executor nativo, sem `npm install`). Testes sintéticos não exigem consultas reais ao TMDB; verificações condicionais de dados reais e ambiente podem ser puladas quando os arquivos ou recursos não estiverem disponíveis. Não execute o notebook como substituto da suíte.
@@ -85,6 +96,10 @@ Consulte o [README técnico](movielens_prototipo/README.md), o [guia do Checkpoi
 
 O catálogo histórico não representa lançamentos nem disponibilidade atual. Gêneros são uma descrição limitada; as métricas dos baselines não avaliam automaticamente o algoritmo da página. Os experimentos internos usam uma divisão e uma amostra de referências; não demonstram superioridade universal. Popularidade foi superior aos demais métodos na comparação interna registrada. O item–item superou o perfil por gêneros, sem justificar sua integração ao produto.
 
-Fonte: MovieLens/GroupLens; referência e condições em [DATASET.md](docs/DATASET.md). Metadados opcionais de pôsteres vêm do TMDB. A disponibilidade estudada utiliza a documentação TMDB/JustWatch, mas não está operacionalmente habilitada. Revisão integral das condições aplicáveis, créditos e autorização humana permanecem necessárias antes da ativação externa.
+Fonte: MovieLens/GroupLens; referência e condições em [DATASET.md](docs/DATASET.md). Metadados opcionais de pôsteres vêm do TMDB. A investigação histórica de disponibilidade TMDB/JustWatch foi preservada como documentação; sua implementação ativa foi removida. Os requisitos de uso externo do TMDB continuam sujeitos à revisão aplicável.
 
 **Não há licença de código escolhida nesta preparação.** O repositório é público, sem concessão de licença geral de reutilização do código. A concordância dos titulares e as decisões aplicáveis de privacidade continuam sujeitas à confirmação humana. Nenhum logotipo externo foi acrescentado.
+
+## Estabilização do escopo final
+
+Consulte o [relatório de encerramento](docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md). O piloto de títulos de 100 filmes foi preservado, sem executar as 98 consultas pendentes. A pesquisa com os 30 títulos cadastrados funciona localmente. Sem credencial TMDB, o pôster usa o placeholder; testes simulados não homologam a API real. O notebook histórico não deve exportar seus módulos antigos sobre a aplicação atual; utilize uma cópia isolada.

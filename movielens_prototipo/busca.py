@@ -9,7 +9,8 @@ def chave(texto):
 
 
 class BuscaCatalogo:
-    def __init__(self, filmes):
+    def __init__(self, filmes, aliases=None):
+        aliases = aliases or {}
         self.itens = []
         for f in filmes.drop_duplicates('movieId').itertuples():
             titulo = f.title
@@ -18,6 +19,9 @@ class BuscaCatalogo:
             # Nomes alternativos já presentes no MovieLens; não cria traduções.
             nomes = [titulo, sem_ano, re.sub(r'\([^)]*\)', '', sem_ano).strip()]
             nomes += [re.sub(r'^a\.k\.a\.\s*', '', n, flags=re.I) for n in re.findall(r'\(([^)]+)\)', sem_ano)]
+            extra = aliases.get(int(f.movieId))
+            if extra:
+                nomes += [extra['titulo_br'], *extra['alternativos']]
             variantes = set()
             for nome in nomes:
                 variantes.add(chave(nome))
@@ -25,7 +29,11 @@ class BuscaCatalogo:
                 if artigo:
                     variantes.add(chave(artigo[2] + ' ' + artigo[1]))
                     variantes.add(chave(artigo[1]))
-            self.itens.append(({'movieId': int(f.movieId), 'titulo': titulo,
+            exibicao = {}
+            if extra:
+                exibicao = {'titulo_br': extra['titulo_br'] + (f' ({ano[1]})' if ano else ''),
+                            'titulo_original': titulo}
+            self.itens.append(({**exibicao, 'movieId': int(f.movieId), 'titulo': titulo,
                                 'ano': int(ano[1]) if ano else None, 'generos': f.genres},
                                sorted(v for v in variantes if v)))
 

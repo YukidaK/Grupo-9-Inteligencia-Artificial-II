@@ -8,11 +8,11 @@ Protótipo acadêmico de Ciência da Computação, FIB. Para instalação, consu
 
 Em catálogos com milhares de títulos, o usuário pode perder tempo procurando o que assistir. O protótipo recomenda até dez filmes a partir de uma a cinco referências ativas. Com zero referências, não gera recomendações personalizadas. Uma ou duas referências são aceitas com orientação adicional; de três a cinco, segue o fluxo normal. Mais referências não garantem maior precisão.
 
-Público: pessoas que usam serviços de streaming e querem descobrir filmes de acordo com seus interesses, sem precisar entender Machine Learning.
+Público: pessoas que querem descobrir filmes a partir de títulos conhecidos, sem precisar entender aprendizado de máquina.
 
-Entrada: de uma a cinco referências ativas, com preferências de gêneros e refinamento pelos comandos reconhecidos na conversa. Informar que assistiu a um filme não significa necessariamente que gostou dele.
+Entrada: de uma a cinco referências, escolhidas no autocomplete. É possível remover uma escolha antes de confirmar ou iniciar uma nova seleção.
 
-Saída: até dez recomendações com justificativas. A comparação com os baselines de popularidade e nota ponderada pertence à avaliação experimental; o baseline de popularidade e o item–item experimental não geram as recomendações da página. A seleção de plataformas existe, mas a consulta real de disponibilidade e o filtro por assinatura continuam desativados.
+Saída: até dez recomendações com justificativas. A comparação com os baselines de popularidade e nota ponderada pertence à avaliação experimental; o baseline de popularidade e o item–item experimental não geram as recomendações da página. Seleção de plataformas, consultas de disponibilidade e refinamento interativo foram definitivamente descontinuados no escopo final.
 
 ### Direitos autorais e utilização
 
@@ -25,9 +25,9 @@ Os direitos dos respectivos autores e as condições de utilização de recursos
 
 ## Aplicação implementada
 
-`app.py` inicia um servidor HTTP local em `127.0.0.1:8000`. `index.html`, `static/autocomplete.js` e `static/streaming.js` compõem a interface. `busca.py` trata a busca e `conversa.py` mantém o perfil e interpreta comandos por regras, sem IA de conversa externa.
+`app.py` inicia um servidor HTTP local em `127.0.0.1:8000`. `index.html` e `static/autocomplete.js` compõem a interface. `busca.py` trata a busca e `conversa.py` mantém a seleção e a sessão; o nome do módulo foi preservado, mas não há conversa interativa.
 
-O perfil distingue histórico de assistidos, referências ativas e rejeições. Há de uma a cinco referências; zero referências impede recomendações personalizadas, preservando histórico e preferências. Uma ou duas referências são aceitas com orientação sobre a possibilidade de fornecer mais filmes, sem promessa de precisão. Excedentes permanecem no histórico, sem preencher automaticamente vagas. A retirada neutra preserva histórico e gêneros; “Não gostei” mantém seu significado de rejeição. O foco após confirmação ou retirada segue as correções UX-02.
+O fluxo aceita de uma a cinco referências, rejeita confirmações fora desse limite e não recomenda com zero. Uma ou duas referências recebem orientação adicional, sem promessa de precisão. O autocomplete permite remover escolhas antes da confirmação. Uma nova confirmação substitui as referências e exclui o histórico já conhecido da sessão; “Nova seleção” reinicia a sessão e o conjunto de escolhas. A confirmação preserva navegação lógica de foco e não o rouba caso o usuário tenha navegado durante a requisição. Não há controles posteriores de rejeição ou preferência de gênero.
 
 `Recomendador.recomendar_perfil()` calcula a média da similaridade Jaccard dos gêneros com as referências. A pontuação combina 0,65 de similaridade, 0,25 de preferência positiva e 0,10 de nota ponderada dividida por cinco. Preferências negativas filtram gêneros. Desempates usam nota ponderada, contagem e menor `movieId`. Filmes conhecidos não retornam como recomendações. Não se utiliza a matriz colaborativa para calcular essa similaridade.
 
@@ -35,11 +35,15 @@ O perfil distingue histórico de assistidos, referências ativas e rejeições. 
 
 Os IDs MovieLens continuam públicos no caminho legado. `identidades.py` distingue fonte, tipo e ID original; isso prepara contratos, sem implementar séries. As sessões de visitantes não são usuários históricos do MovieLens. Não há banco de dados; o estado da sessão é temporário em memória.
 
-## Pôsteres e streaming
+## Pesquisa por títulos brasileiros
+
+O autocomplete pesquisa aliases locais associados aos IDs MovieLens, com apresentação brasileira quando cadastrada. A cobertura atual é de 30 filmes, ampliada manualmente em 13/11/2026. Consulte [Títulos brasileiros](TITULOS_BR.md) para fontes, validação e limites.
+
+## Pôsteres e dependências preservadas
 
 `posteres.py` consulta opcionalmente metadados TMDB com IDs do mapeamento `links.csv`, sem associar títulos por aproximação. As imagens utilizam URLs públicas autorizadas do TMDB; o cache persistido é de metadados JSON, não um repositório de imagens. O TTL normal é sete dias, com políticas específicas para respostas negativas e falhas. Há deduplicação por chave, gravação atômica e orçamento de operações externas compartilhado. Sem credencial, mapeamento ou resposta utilizável, permanece o placeholder. Credenciais são de servidor e opcionais; a instalação básica funciona sem elas. Veja [proteção de pôsteres](PROTECAO_POSTERES.md) e o exemplo público `.env.example`, que não é carregado automaticamente como configuração.
 
-A seção de streaming permite guardar região BR, IDs e modo RESTRITO/FLEXÍVEL na sessão. Provedores retirados do catálogo são preservados para revisão e remoção explícita. **O catálogo público homologado continua vazio, o transporte de disponibilidade não é ativado e as preferências não filtram recomendações de produção.** Não há confirmação de oferta por assinatura na página. O código isolado e os testes simulados não constituem autorização de uso externo. Veja [interface](STREAMING_WEB.md), [contrato](DISPONIBILIDADE.md), [transporte](TRANSPORTE_TMDB.md), [filtro isolado](FILTRO_STREAMING.md), [homologação](HOMOLOGACAO_STREAMING.md) e [preparação operacional](PREPARACAO_STREAMING.md).
+Streaming foi retirado definitivamente do produto: não há painel, catálogo, preferências, filtro, cliente de disponibilidade ou rota `/api/streaming`. Os documentos das RF anteriores são registros históricos, não instruções para habilitar funcionalidades atuais. Consulte o [relatório do encerramento](../docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md).
 
 ## Ambiente e comandos
 
@@ -54,7 +58,7 @@ Ambiente de referência Python 3.12; versões registradas em `requirements-verif
 
 ```sh
 .venv/bin/python -B -m unittest discover -s movielens_prototipo -p testes.py
-node --test movielens_prototipo/testes_autocomplete.cjs movielens_prototipo/testes_streaming.cjs
+node --test --test-isolation=none movielens_prototipo/testes_autocomplete.cjs
 ```
 
 A suíte principal reúne testes sintéticos, HTTP simulado e experimentais. Recursos ausentes podem provocar skips condicionais; DOM simulado não comprova acessibilidade completa ou responsividade visual. Os comandos são instruções, não novos resultados de testes da GIT-02. Nenhuma instalação ou consulta externa foi realizada nesta preparação.
@@ -69,4 +73,8 @@ As instruções antigas dos documentos de cada etapa podem citar `experimentos/`
 
 O notebook acadêmico existente foi preservado: 15 células, sete de código e nenhuma saída incorporada na revisão GIT-02. Contém instalação via pip, exportação de módulos, preparação, avaliação e conversa. Se executado, escreve arquivos e exporta um ZIP de resultados, inclusive individuais; use uma cópia em diretório isolado, revise cada célula e mantenha o ZIP local. Não executa automaticamente toda a cadeia experimental aqui descrita. O notebook foi retirado do índice na GIT-05 e permanece local; sua versão antiga continua acessível no histórico publicado. Não integra os 96 candidatos atuais.
 
-Não há disponibilidade real homologada, streaming operacional, item–item na página, suporte a séries ou avaliação quantitativa da conversa e da UX. Uma única divisão não mede robustez. Não foi concedida licença geral de reutilização do código; a concordância dos titulares e as condições integrais para ativação externa continuam pendentes. O histórico Git original permanece preservado. Dados originais, matrizes, partições e caches não integram a seleção pública.
+Streaming e refinamento interativo foram descontinuados. Não há item–item na página, suporte a séries ou avaliação quantitativa da UX. Uma única divisão não mede robustez. Não foi concedida licença geral de reutilização do código; a concordância dos titulares e as condições integrais para ativação externa continuam pendentes. O histórico Git original permanece preservado. Dados originais, matrizes, partições e caches não integram a seleção pública.
+
+## Estabilização do escopo final
+
+Consulte o [relatório de encerramento](../docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md). O piloto de títulos de 100 filmes foi preservado, sem executar as 98 consultas pendentes. A pesquisa com os 30 títulos cadastrados funciona localmente. Sem credencial TMDB, o pôster usa o placeholder; testes simulados não homologam a API real. O notebook histórico não deve exportar seus módulos antigos sobre a aplicação atual; utilize uma cópia isolada.

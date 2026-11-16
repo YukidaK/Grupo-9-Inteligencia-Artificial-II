@@ -17,9 +17,10 @@ import urllib.error
 
 from posteres import Posteres,ErroPoster,SemRedirecionamentoPoster,PLACEHOLDER,IMAGE_BASE,TTL
 from operacao_externa import ControleExterno,TravaRegistro
-from tmdb_disponibilidade import ClienteDisponibilidadeTMDB
+from piloto_titulos import TransporteTraducoesTMDB
+from transporte_tmdb import FalhaConsulta
 from identidades import conteudo_movielens
-from testes_tmdb_disponibilidade import Resposta as RespostaDisponibilidade,payload
+from testes_transporte_tmdb import Resposta as RespostaTMDB
 
 TOKEN='TOKEN_SINTETICO_PROTECAO_POSTER'
 CONFIG={'images':{'secure_base_url':IMAGE_BASE,'poster_sizes':['w185','w342','w500']}}
@@ -198,16 +199,17 @@ class ProtecaoPosteresTests(unittest.TestCase):
                 self.assertEqual(p.obter(1)['poster_url'],PLACEHOLDER);self.assertFalse(path.exists())
                 self.assertEqual(p.controle.em_andamento,0);self.hora+=61;self.tick+=61
                 p.abrir=self.responder;self.assertIn('/p100.jpg',p.obter(1)['poster_url'])
-    def test_429_retry_after_e_quota_compartilhada_com_disponibilidade(self):
+    def test_429_retry_after_e_quota_compartilhada_com_piloto(self):
         ctrl=ControleExterno(relogio=lambda:self.tick)
         def erro(req,timeout):raise urllib.error.HTTPError(req.full_url,429,TOKEN,{'Retry-After':'120'},None)
         p=self.servico(abrir=erro,controle=ctrl);self.assertEqual(p.obter(1)['poster_url'],PLACEHOLDER)
         calls=[]
-        def disponibilidade(req,timeout):calls.append(1);return RespostaDisponibilidade(req.full_url,payload())
+        def traducoes(req,timeout):calls.append(1);return RespostaTMDB(req.full_url,{'id':100,'translations':[]})
         with patch.dict('os.environ',{'TMDB_READ_ACCESS_TOKEN':TOKEN}):
-            c=ClienteDisponibilidadeTMDB({conteudo_movielens(1):100},habilitado=True,termos_aprovados=True,
-                abrir=disponibilidade,controle=ctrl,monotono=lambda:self.tick)
-        self.assertEqual(c.obter(conteudo_movielens(1)).motivo,'CONSULTA_SUSPENSA');self.assertEqual(calls,[])
+            c=TransporteTraducoesTMDB([100],habilitado=True,termos_aprovados=True,
+                abrir=traducoes,controle=ctrl,monotono=lambda:self.tick)
+        with self.assertRaisesRegex(FalhaConsulta,'CONSULTA_SUSPENSA'):c.consultar_traducoes(100)
+        self.assertEqual(calls,[])
         self.hora+=121;self.tick+=121;p.abrir=self.responder
         self.assertIn('/p100.jpg',p.obter(1)['poster_url']);self.assertEqual(ctrl.em_andamento,0)
     def test_orcamento_esgotado_e_trava_global_nao_abrem_rede(self):

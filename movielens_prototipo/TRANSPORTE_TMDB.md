@@ -1,3 +1,5 @@
+> Registro histórico: streaming foi definitivamente descontinuado em 11/11/2026. Os módulos e rotas aqui descritos não fazem parte do produto atual. Consulte [encerramento de escopo](../docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md).
+
 # RF-02B — Transporte seguro de disponibilidade
 
 Implementação isolada em `tmdb_disponibilidade.py`, sem importação por `app.py`, sessão, interface ou recomendador. Construir o cliente não consulta a rede. Está desativado por padrão, inclusive se existir token no ambiente. A RF-02C acrescentou consulta controlada por orçamento em fluxo interno, sem ativação pública; RF-02D e Etapa 5 permanecem pausadas.

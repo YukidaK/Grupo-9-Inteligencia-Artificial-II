@@ -1,3 +1,5 @@
+> Registro histórico: streaming foi definitivamente descontinuado em 11/11/2026. Os módulos e rotas aqui descritos não fazem parte do produto atual. Consulte [encerramento de escopo](../docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md).
+
 # RF-02D — Interface de preferências de streaming
 
 Configuração de sessão, sem filtro de disponibilidade ativo. A página informa claramente que a seleção não altera as recomendações. Nenhuma oferta fictícia é apresentada. O transporte RF-02B não é construído ou chamado por esta integração; algoritmo, pesos, referências, histórico, rejeições e gêneros seguem o fluxo anterior. RF-02E e Etapa 5 pausadas; termos integrais TMDB ainda pendentes.

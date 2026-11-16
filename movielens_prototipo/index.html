@@ -1,75 +1,161 @@
 <!doctype html>
-<html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CineMatch · MovieLens</title>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CineMatch · MovieLens</title>
 <style>
-body{margin:0;background:#10131d;color:#edf0fa;font:16px system-ui}main{max-width:1050px;margin:auto;padding:32px 20px}small{color:#bac5dd}h1{font-size:40px;margin-bottom:8px}h1 span{color:#b2a1ff}p{line-height:1.6}textarea,input,select{box-sizing:border-box;width:100%;padding:12px;background:#1d2332;color:white;border:1px solid #63708e;border-radius:8px;font:inherit}textarea{min-height:90px}button{padding:11px 16px;border:0;border-radius:8px;background:#b2a1ff;color:#151026;font-weight:bold;cursor:pointer;margin:9px 8px 9px 0}button:disabled{opacity:.5;cursor:wait}#cards,.profile{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}article,.panel{padding:18px;background:#1b2232;border:1px solid #343e56;border-radius:12px;margin:14px 0}article h3{font-size:19px}#status{color:#d2c7ff;white-space:pre-line}label{display:block;margin:10px 0}#review label{padding:12px;background:#252d40;border-radius:8px}#messages p{padding:9px 14px;border-left:3px solid #b2a1ff;white-space:pre-wrap}footer{margin-top:30px;color:#bac5dd}li{margin:10px 0}input[type=checkbox]{width:auto}button.secondary{background:#303c57;color:#edf0fa}
-
-.poster{display:block;width:100%;height:auto;aspect-ratio:2/3;object-fit:cover;background:#252d40;border-radius:9px;margin:10px 0}.poster.mini{width:96px;max-width:100%}.tmdb-logo{display:block;width:90px;height:auto;background:white;padding:10px;margin:12px 0}a{color:#c7baff}
-
-.combobox-wrap{position:relative}#suggestions{position:absolute;z-index:10;top:100%;left:0;right:0;max-height:360px;overflow-y:auto;padding:0;margin:4px 0;list-style:none;background:#1b2232;border:1px solid #63708e;border-radius:8px;box-shadow:0 10px 24px #0008}#suggestions li{display:flex;align-items:center;gap:12px;padding:10px;margin:0;cursor:pointer;border-bottom:1px solid #343e56}#suggestions li[aria-selected="true"],#suggestions li:hover{background:#3b355c;outline:2px solid #b2a1ff;outline-offset:-2px}#suggestions span{min-width:0;overflow-wrap:anywhere}#suggestions .poster.mini{width:44px;flex-shrink:0;margin:0}#selected-films{padding:0;list-style:none}#selected-films li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;background:#252d40;border-radius:8px}#selected-films button{flex-shrink:0}#search-status{min-height:1.5em}input:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #b2a1ff;outline-offset:3px}@media(max-width:480px){#selected-films li{flex-wrap:wrap}#suggestions{max-height:280px}}
-summary{cursor:pointer;padding:10px 0}
-
-.streaming-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px}.streaming-choice,.streaming-mode{display:flex;align-items:center;gap:10px;min-height:44px;margin:0;padding:10px 12px;border:1px solid #63708e;border-radius:8px;cursor:pointer;overflow-wrap:anywhere}.streaming-choice input,.streaming-mode input{width:20px;height:20px;flex-shrink:0;accent-color:#b2a1ff}.streaming-choice:has(input:checked),.streaming-mode:has(input:checked){background:#303650;border-color:#b2a1ff}#streaming-form fieldset{min-width:0;border:0;padding:0;margin:12px 0}#streaming-form legend{padding:0;margin-bottom:8px;font-weight:600}#streaming-status{min-height:1.5em}#streaming-empty{color:#bac5dd}.streaming-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px}input[type=radio]{width:auto}select:focus-visible{outline:3px solid #b2a1ff;outline-offset:3px}
-#profile-title:focus{outline:3px solid #b2a1ff;outline-offset:3px}
-#streaming-form input:focus,#streaming-form button:focus{outline:3px solid #b2a1ff;outline-offset:3px}
+*{box-sizing:border-box}
+body{margin:0;background:#10131d;color:#edf0fa;font:16px system-ui}
+main{max-width:1050px;margin:auto;padding:32px 20px}
+h1{font-size:40px;margin-bottom:8px}h1 span{color:#b2a1ff}
+p{line-height:1.6}small{color:#bac5dd}a{color:#c7baff}
+input{width:100%;min-height:48px;padding:12px;background:#141a29;color:#edf0fa;border:1px solid #7885a4;border-radius:8px;font:inherit}
+input::placeholder{color:#b8c2da;opacity:1}input:hover{border-color:#b2a1ff}
+button{min-height:44px;padding:11px 16px;border:0;border-radius:8px;background:#b2a1ff;color:#151026;font-weight:bold;cursor:pointer;margin:9px 8px 9px 0;max-width:100%;white-space:normal}
+button:disabled{opacity:.5;cursor:wait}button.secondary{background:#303c57;color:#edf0fa}
+input:focus-visible,button:focus-visible,#profile-title:focus{outline:3px solid #b2a1ff;outline-offset:3px}
+article,.panel{padding:18px;background:#1b2232;border:1px solid #343e56;border-radius:12px;margin:14px 0}
+#cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:14px}
+article h3{font-size:19px}#status{color:#d2c7ff;white-space:pre-line}
+label{display:block;margin:10px 0}li{margin:10px 0}footer{margin-top:30px;color:#bac5dd}
+.poster{display:block;width:100%;height:auto;aspect-ratio:2/3;object-fit:cover;background:#252d40;border-radius:9px;margin:10px 0}
+.poster.mini{width:64px;flex-shrink:0;margin:0}.tmdb-logo{display:block;width:90px;height:auto;background:white;padding:10px;margin:12px 0}
+.combobox-wrap{position:relative}
+#suggestions{position:absolute;z-index:10;top:100%;left:0;right:0;max-height:360px;overflow-y:auto;padding:0;margin:4px 0;list-style:none;background:#1b2232;border:1px solid #63708e;border-radius:8px;box-shadow:0 10px 24px #0008}
+#suggestions li{display:flex;align-items:center;gap:12px;padding:10px;margin:0;cursor:pointer;border-bottom:1px solid #343e56}
+#suggestions li[aria-selected="true"],#suggestions li:hover{background:#3b355c;outline:2px solid #b2a1ff;outline-offset:-2px}
+#suggestions span{min-width:0;overflow-wrap:anywhere}#suggestions .poster.mini{width:44px}
+.original-title{display:block;margin-top:3px;color:#bac5dd;font-weight:normal}
+#selected-films{padding:0;list-style:none}
+#selected-films li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;background:#252d40;border-radius:8px}
+#selected-films button{flex-shrink:0}#search-status{min-height:1.5em}
+#refs{padding:0;list-style:none}#refs li{display:flex;align-items:center;gap:12px}
+#refs li,#selected-films li,#cards h3{overflow-wrap:anywhere}
+@media(max-width:480px){main{padding:22px 12px}article,.panel{padding:14px}#selected-films li{flex-wrap:wrap}#suggestions{max-height:280px}}
+[hidden]{display:none!important}
 </style>
-<main><small>PROJETO ACADÊMICO · MOVIELENS</small><h1>Seu próximo <span>filme.</span></h1>
-<p>Escolha de 1 a 5 filmes como referências ativas. Com 1 ou 2, fornecer mais filmes pode ajudar a identificar suas preferências, sem garantir maior precisão.</p>
-<section class="panel" aria-labelledby="streaming-title"><h2 id="streaming-title">1. Seus serviços <small>(opcional)</small></h2>
-<p id="streaming-notice">Filtro de streaming desativado. As escolhas ainda não alteram as recomendações.</p>
-<form id="streaming-form" aria-describedby="streaming-notice">
-<fieldset id="streaming-services" disabled><legend>Serviços que você assina · Brasil</legend><div id="streaming-grid" class="streaming-grid"></div></fieldset>
-<p id="streaming-empty" hidden>Catálogo brasileiro em validação. Você pode salvar o modo desejado ou continuar escolhendo filmes.</p>
-<p id="streaming-count" role="status" aria-live="polite">0 serviços selecionados</p>
-<fieldset id="streaming-modes" disabled><legend>Modo de preferência</legend><div class="streaming-modes">
-<label class="streaming-mode" for="streaming-restricted"><input id="streaming-restricted" type="radio" name="streaming-mode" value="restrito" checked><span>RESTRITO — Apenas minhas assinaturas</span></label>
-<label class="streaming-mode" for="streaming-flexible"><input id="streaming-flexible" type="radio" name="streaming-mode" value="flexivel"><span>FLEXÍVEL — Explorar outros serviços</span></label></div></fieldset>
-<button id="streaming-save" type="submit" data-streaming-control disabled>Salvar preferências</button><button id="streaming-retry" type="button" class="secondary" data-streaming-control hidden>Tentar novamente</button>
-<p id="streaming-status" role="status" aria-live="polite"></p></form></section>
-<section class="panel" aria-labelledby="search-title"><h2 id="search-title">2. Adicionar filmes assistidos</h2>
-<form id="search" autocomplete="off"><label for="titles">Buscar um filme assistido</label>
-<div class="combobox-wrap"><input id="titles" type="text" maxlength="200" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="suggestions" aria-describedby="search-help search-status" placeholder="Teste digitando Toy ou Matrix">
-<ul id="suggestions" role="listbox" aria-label="Sugestões do catálogo" hidden></ul></div>
-<p id="search-help"><small>Escolha o título e o ano. Use as setas e Enter, ou toque em uma sugestão. O catálogo pode usar nomes em inglês.</small></p>
+</head>
+<body>
+<main>
+<small>PROJETO ACADÊMICO · MOVIELENS</small>
+<h1>Seu próximo <span>filme.</span></h1>
+<p>Escolha de 1 a 5 filmes como referências. Com 1 ou 2, fornecer mais filmes pode ajudar a identificar suas preferências, sem garantir maior precisão.</p>
+<section class="panel" aria-labelledby="search-title">
+<h2 id="search-title">1. Escolha seus filmes</h2>
+<form id="search" autocomplete="off">
+<label for="titles">Buscar um filme</label>
+<div class="combobox-wrap">
+<input id="titles" type="text" maxlength="200" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="suggestions" aria-describedby="search-help search-status" placeholder="Ex.: Matrix ou O Poderoso Chefão">
+<ul id="suggestions" role="listbox" aria-label="Sugestões do catálogo" hidden></ul>
+</div>
+<p id="search-help"><small>Busque pelo título original ou por um título brasileiro cadastrado. Confira o ano. Use as setas e Enter ou toque na sugestão.</small></p>
 <p id="search-status" role="status" aria-live="polite">Digite pelo menos 2 caracteres para buscar.</p>
-<h3>Seleção a confirmar</h3><p><small>É necessária pelo menos uma referência ativa. Até cinco filmes preencherão as vagas de referência; os excedentes ficarão apenas no histórico de assistidos, também excluídos das recomendações.</small></p>
-<ul id="selected-films" aria-label="Filmes selecionados"></ul><button id="confirm-selection" type="submit">Confirmar filmes selecionados</button></form></section>
+<h3>Seleção a confirmar</h3>
+<p><small>Selecione de um a cinco filmes. Você pode remover um título antes de confirmar.</small></p>
+<ul id="selected-films" aria-label="Filmes selecionados"></ul>
+<button id="confirm-selection" type="submit">Gerar recomendações</button>
+</form>
+</section>
 <p id="status" role="status" aria-live="polite"></p>
-<section aria-label="Seu perfil"><h2 id="profile-title" tabindex="-1">3. Seu perfil</h2><div class="profile"><div class="panel"><h3>Referências ativas · até cinco</h3><ul id="refs"></ul></div><div class="panel"><h3>Assistidos fora do perfil</h3><p><small>Também ficam fora das sugestões.</small></p><ul id="extras"></ul></div><div class="panel"><h3>Assistidos e rejeitados</h3><ul id="rejected"></ul></div></div><p id="prefs"></p><button id="reset" class="secondary">Reiniciar sessão</button></section>
-<section><h2>4. Até dez sugestões para você</h2><div id="cards"></div></section>
-<section class="panel"><h2>5. Ajustar as sugestões</h2><p>Modo local com comandos limitados: “Quero mais suspense”, “Não gosto de terror”, “Prefiro ficção científica”, “Assisti TÍTULO, mas não gostei”, “Por que 1?” e “Limpar minhas preferências”.</p><div id="messages" role="log" aria-live="polite"></div><form id="chat"><label for="message">Sua mensagem</label><input id="message" required maxlength="2000" placeholder="Quero mais suspense"><button>Enviar</button><button id="clear" type="button" class="secondary">Limpar minhas preferências</button></form></section>
-<footer>Os filmes assistidos são referências provisórias; assistir não significa gostar. Notas exibidas são médias das avaliações do treino. O modo local não compreende livremente enredos ou conversas.<section aria-labelledby="credits"><h2 id="credits">Sobre / Créditos</h2><p>Projeto acadêmico CineMatch. Recomendações e avaliações baseadas no MovieLens. Pôsteres opcionais fornecidos pelo TMDB.</p><a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer"><img class="tmdb-logo" loading="lazy" src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg" alt="The Movie Database (TMDB)"></a><p lang="en">This product uses the TMDB API but is not endorsed or certified by TMDB.</p></section></footer></main>
-<script src="/static/autocomplete.js?v=20261020-3" onerror="document.getElementById('search-status').textContent='O autocomplete não carregou. Encerre o servidor no terminal com Ctrl+C, execute novamente app.py e atualize esta página com Ctrl+Shift+R.'"></script>
-<script src="/static/streaming.js?v=20261030-1" onerror="document.getElementById('streaming-status').textContent='As preferências de streaming não carregaram. Você pode continuar escolhendo filmes.'"></script>
+<section aria-labelledby="profile-title">
+<h2 id="profile-title" tabindex="-1">2. Referências confirmadas</h2>
+<ul id="refs"></ul>
+<button id="reset" type="button" class="secondary">Nova seleção</button>
+</section>
+<section aria-labelledby="results-title">
+<h2 id="results-title">3. Até dez sugestões para você</h2>
+<div id="cards"></div>
+</section>
+<footer>
+<p>Os filmes informados são referências provisórias. Notas exibidas são médias das avaliações do treino.</p>
+<section aria-labelledby="credits"><h2 id="credits">Sobre / Créditos</h2>
+<p>Projeto acadêmico CineMatch. Recomendações e avaliações baseadas no MovieLens. Pôsteres opcionais fornecidos pelo TMDB.</p>
+<a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer"><img class="tmdb-logo" loading="lazy" src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg" alt="The Movie Database (TMDB)" onerror="this.hidden=true"></a>
+<p lang="en">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+</section>
+</footer>
+</main>
+<script src="/static/autocomplete.js?v=20261111-final" onerror="document.getElementById('search-status').textContent='A busca não carregou. Reinicie o servidor e atualize a página com Ctrl+Shift+R.'"></script>
 <script>
-const $=s=>document.querySelector(s);let state=null,busy=false;
+const $=s=>document.querySelector(s);
+let state=null,busy=false;
+const openedAsFile=window.location?.protocol==='file:';
 function el(tag,text){const n=document.createElement(tag);n.textContent=text;return n}
-function button(text,fn){const b=el('button',text);b.type='button';b.onclick=fn;return b}
-// Metadados carregados somente quando a imagem entra perto da área visível.
 const posterQueue=[];let posterRequests=0;
 const posterObserver='IntersectionObserver' in window?new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){posterObserver.unobserve(e.target);posterQueue.push(e.target);drainPosters()}})},{rootMargin:'200px'}):null;
 function poster(f,mini=false){const img=document.createElement('img');img.className='poster'+(mini?' mini':'');img.width=342;img.height=513;img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.alt='Pôster de '+f.titulo;img.src='/static/poster-placeholder.svg';img.dataset.movieId=f.movieId;img.dataset.mini=mini?'1':'';img.onerror=()=>{img.onerror=null;img.src='/static/poster-placeholder.svg';img.alt='Pôster indisponível para '+f.titulo};if(posterObserver)posterObserver.observe(img);else{posterQueue.push(img);queueMicrotask(drainPosters)}return img}
 async function drainPosters(){while(posterRequests<2&&posterQueue.length){const img=posterQueue.shift();if(!img.isConnected)continue;posterRequests++;(async()=>{try{const r=await fetch('/api/poster/'+img.dataset.movieId);if(!r.ok)return;const d=await r.json();const url=img.dataset.mini?d.thumbnail_url:d.poster_url;if(img.isConnected&&(url==='/static/poster-placeholder.svg'||/^https:\/\/image\.tmdb\.org\/t\/p\/w(?:185|342|500)\/[A-Za-z0-9_-]+\.(?:jpg|jpeg|png|webp)$/.test(url))){img.src=url;if(url.startsWith('/static/'))img.alt='Pôster indisponível para '+img.alt.replace(/^Pôster de /,'')}}catch(e){/* Placeholder já está visível; recomendações continuam disponíveis. */}finally{posterRequests--;drainPosters()}})()}}
-async function api(data){if(busy)return;busy=true;document.querySelectorAll('button:not([data-streaming-control])').forEach(b=>b.disabled=true);try{const r=await fetch('/api/recomendar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const d=await r.json();if(!r.ok)throw Error(d.erro||'Falha no servidor');state=d;render(d);return d}catch(e){$('#status').textContent='Não foi possível concluir: '+e.message}finally{busy=false;document.querySelectorAll('button:not([data-streaming-control])').forEach(b=>b.disabled=false)}}
-// Somente confirmação/retirada: mantém a navegação sem alterar api().
-async function profileAction(origin,operation){
+
+async function api(data){
+ if(openedAsFile||busy)return;
+ busy=true;
+ document.querySelectorAll('button').forEach(b=>b.disabled=true);
+ try{
+  const r=await fetch('/api/recomendar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const d=await r.json();
+  if(!r.ok)throw Error(d.erro||'Falha no servidor');
+  state=d;render(d);return d;
+ }catch(e){$('#status').textContent='Não foi possível concluir: '+e.message}
+ finally{busy=false;document.querySelectorAll('button').forEach(b=>b.disabled=false)}
+}
+async function profileAction(origin,operation,destination='#profile-title'){
  const initial=document.activeElement||origin;let moved=false;
- const watch=e=>{if(e.target!==document.body&&e.target!==initial)moved=true;};
+ const watch=e=>{if(e.target!==document.body&&e.target!==initial)moved=true};
  document.addEventListener('focusin',watch);
- try{const result=await operation();
+ try{
+  const result=await operation();
   if(!moved&&(!document.activeElement||document.activeElement===document.body||document.activeElement===initial)){
-   if(result)$('#profile-title').focus();
-   else if(initial?.isConnected)initial.focus();
+   if(result)$(destination).focus();else if(initial?.isConnected)initial.focus();
   }
   return result;
- }finally{document.removeEventListener('focusin',watch);}
+ }finally{document.removeEventListener('focusin',watch)}
 }
-function clearImages(container){if(posterObserver)container.querySelectorAll('img.poster').forEach(img=>posterObserver.unobserve(img));container.replaceChildren()}
-function render(d){$('#status').textContent=d.mensagem;for(const [key,id] of [['referencias','#refs'],['excedentes','#extras'],['rejeitados','#rejected']]){const list=$(id);clearImages(list);if(!d[key].length)list.append(el('li','Nenhum filme.'));d[key].forEach(f=>{const li=el('li',f.titulo);li.prepend(poster(f,true));if(key==='excedentes'){const sel=el('select','');sel.setAttribute('aria-label','Referência a substituir por '+f.titulo);sel.append(new Option('Escolha qual referência substituir',''));if(d.referencias.length===5){d.referencias.forEach(r=>sel.append(new Option(r.titulo,r.movieId)));li.append(sel)}li.append(button('Considerar',()=>{if(d.referencias.length===5&&!sel.value){$('#status').textContent='Escolha a referência que deseja substituir.';return}api({acao:'considerar',movieId:f.movieId,substituir:sel.value?Number(sel.value):null})}))}if(key==='referencias'){const actions=el('details',''),summary=el('summary','Ações');summary.setAttribute('aria-label','Ações para '+f.titulo);const remove=button('Remover referência',()=>profileAction(remove,()=>api({acao:'remover_referencia',movieId:f.movieId})));remove.setAttribute('aria-label','Remover referência: '+f.titulo);const reject=button('Não gostei',()=>api({acao:'rejeitar',movieId:f.movieId}));reject.setAttribute('aria-label','Não gostei: '+f.titulo);actions.append(summary,remove,reject);li.append(actions)}list.append(li)})}
-$('#prefs').textContent='Preferências: '+(d.preferencias.positivas.join(', ')||'nenhuma')+' · Excluir gêneros: '+(d.preferencias.negativas.join(', ')||'nenhum');clearImages($('#cards'));d.recomendacoes.forEach((f,i)=>{const a=el('article','');a.append(poster(f),el('small','Sugestão '+(i+1)),el('h3',f.titulo),el('p',f.generos.split('|').join(' · ')),el('p','★ '+f.nota_media_treino+' / 5 · '+f.avaliacoes_treino+' avaliações no treino'),el('p',f.motivo),button('Já assisti',()=>api({acao:'mensagem',texto:'Assisti '+f.titulo})),button('Assisti, mas não gostei',()=>api({acao:'rejeitar',movieId:f.movieId})));$('#cards').append(a)});$('#message').disabled=!d.assistidos.length;if(typeof autocomplete!=='undefined'&&autocomplete)autocomplete.renderSelection()}
-const autocomplete=typeof MovieAutocomplete==='function'?new MovieAutocomplete({input:$('#titles'),list:$('#suggestions'),selected:$('#selected-films'),status:$('#search-status'),poster,clearOptions:()=>clearImages($('#suggestions')),existing:()=>state?.assistidos||[],references:()=>state?.referencias||[],fetchSuggestions:async(query,signal)=>{const r=await fetch('/api/filmes?q='+encodeURIComponent(query),{signal});if(r.status===404){const error=Error('Endpoint ausente');error.userMessage='O servidor aberto ainda não tem a busca de filmes. Encerre-o no terminal com Ctrl+C, execute novamente app.py e atualize esta página com Ctrl+Shift+R.';throw error}const d=await r.json();if(!r.ok)throw Error(d.erro||'Falha na busca');return d.sugestoes}}):null;
-async function streamingRequest(data){const r=await fetch('/api/streaming',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const d=await r.json();if(!r.ok)throw Error('Falha nas preferências');return d}
-const streaming=typeof StreamingPreferencesUI==='function'?new StreamingPreferencesUI({form:$('#streaming-form'),grid:$('#streaming-grid'),services:$('#streaming-services'),modes:$('#streaming-modes'),restricted:$('#streaming-restricted'),flexible:$('#streaming-flexible'),save:$('#streaming-save'),count:$('#streaming-count'),status:$('#streaming-status'),empty:$('#streaming-empty'),retry:$('#streaming-retry'),load:()=>streamingRequest({acao:'estado'}),send:streamingRequest}):null;
-$('#search').onsubmit=async e=>{e.preventDefault();if(!autocomplete){$('#search-status').textContent='O autocomplete não carregou. Reinicie o servidor no terminal e atualize a página com Ctrl+Shift+R.';return}if(!autocomplete.items.length){$('#search-status').textContent='Escolha pelo menos um filme nas sugestões antes de confirmar.';return}const ids=autocomplete.items.map(f=>f.movieId);const d=await profileAction($('#confirm-selection'),()=>api({acao:'confirmar_selecao',ids}));if(d)autocomplete.confirmed(ids)};
-$('#chat').onsubmit=async e=>{e.preventDefault();const t=$('#message').value;const d=await api({acao:'mensagem',texto:t});if(d){$('#messages').append(el('p','Você: '+t),el('p','CineMatch: '+d.mensagem));$('#message').value=''}};
-$('#clear').onclick=()=>api({acao:'mensagem',texto:'Limpar minhas preferências'});$('#reset').onclick=async()=>{const d=await api({acao:'reiniciar'});if(d){$('#messages').replaceChildren();autocomplete?.reset();streaming?.carregar()}};api({acao:'estado'}).then(()=>streaming?.carregar());
-</script></html>
+function clearImages(container){
+ if(posterObserver)container.querySelectorAll('img.poster').forEach(img=>posterObserver.unobserve(img));
+ container.replaceChildren();
+}
+function render(d){
+ $('#status').textContent=d.mensagem;
+ clearImages($('#refs'));
+ if(!d.referencias.length)$('#refs').append(el('li','Nenhum filme confirmado.'));
+ d.referencias.forEach(f=>{
+  const li=el('li','');li.append(poster(f,true),el('span',f.titulo));$('#refs').append(li);
+ });
+ clearImages($('#cards'));
+ d.recomendacoes.forEach((f,i)=>{
+  const card=el('article','');
+  card.append(poster(f),el('small','Sugestão '+(i+1)),el('h3',f.titulo),
+   el('p',f.generos.split('|').join(' · ')),
+   el('p','★ '+f.nota_media_treino+' / 5 · '+f.avaliacoes_treino+' avaliações no treino'),el('p',f.motivo));
+  $('#cards').append(card);
+ });
+}
+const autocomplete=!openedAsFile&&typeof MovieAutocomplete==='function'?new MovieAutocomplete({
+ input:$('#titles'),list:$('#suggestions'),selected:$('#selected-films'),status:$('#search-status'),poster,
+ clearOptions:()=>clearImages($('#suggestions')),
+ fetchSuggestions:async(query,signal)=>{
+  const r=await fetch('/api/filmes?q='+encodeURIComponent(query),{signal});
+  if(r.status===404){const e=Error('Busca ausente');e.userMessage='Encerre o servidor com Ctrl+C, execute app.py e atualize a página com Ctrl+Shift+R.';throw e}
+  const d=await r.json();if(!r.ok)throw Error(d.erro||'Falha na busca');return d.sugestoes;
+ }
+}):null;
+$('#search').onsubmit=async e=>{
+ e.preventDefault();
+ if(!autocomplete){if(!openedAsFile)$('#search-status').textContent='A busca não carregou. Reinicie o servidor e atualize a página.';return}
+ if(!autocomplete.items.length){$('#search-status').textContent='Escolha pelo menos um filme antes de confirmar.';return}
+ const ids=autocomplete.items.map(f=>f.movieId);
+ const d=await profileAction($('#confirm-selection'),()=>api({acao:'confirmar_selecao',ids}));
+ if(d)autocomplete.confirmed(ids);
+};
+$('#reset').onclick=async()=>{
+ const d=await profileAction($('#reset'),()=>api({acao:'reiniciar'}),'#titles');
+ if(d)autocomplete?.reset();
+};
+if(openedAsFile){
+ $('#titles').disabled=true;$('#confirm-selection').disabled=true;
+ $('#search-status').textContent='Execute app.py e abra http://127.0.0.1:8000 no navegador para buscar filmes.';
+}else{api({acao:'estado'})}
+</script>
+</body>
+</html>

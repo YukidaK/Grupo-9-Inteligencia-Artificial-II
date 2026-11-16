@@ -1,3 +1,5 @@
+> Registro histórico: streaming foi definitivamente descontinuado em 11/11/2026. Os módulos e rotas aqui descritos não fazem parte do produto atual. Consulte [encerramento de escopo](../docs/ENCERRAMENTO_ESCOPO_CINEMATCH.md).
+
 # RF-02E2-PRE — Preparação sem ativação
 
 A coleta autenticada, a promoção do catálogo e o uso externo não estão autorizados por este documento. RF-02E2 e Etapa 5 permanecem pausadas. Procedimento 1, esquema de catálogo local 1. Nenhuma credencial deve integrar arquivos, comandos de exemplo, relatórios ou logs.
