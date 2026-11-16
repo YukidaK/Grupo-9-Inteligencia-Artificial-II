@@ -2,6 +2,17 @@
 
 Protótipo acadêmico de recomendação de filmes do curso de Ciência da Computação da FIB. O projeto permite pesquisar filmes, selecionar referências e obter recomendações, além de comparar métodos em experimentos offline com o MovieLens Latest Small.
 
+## Integrantes
+
+| Nome                          | Responsabilidades                          |
+| ----------------------------- | ------------------------------------------ |
+| Cauâ Ferreira Cardoso         | Protótipo web                              |
+| Eduardo Miquéias Melo Sun     | Comunicação e materiais                    |
+| Laura Lopes Húngaro           | Experimentos e análise de erros            |
+| Leidiane Magalhães Silva      | Dados e EDA                                |
+| Matheus Yuuki Okida Kamiya    | Pré-processamento e divisão treino e teste |
+
+
 ## Sistema de recomendação de filmes
 
 ### Problema e público
@@ -10,9 +21,9 @@ Em catálogos com milhares de títulos, o usuário pode perder tempo procurando 
 
 Público: pessoas que querem descobrir filmes a partir de títulos conhecidos, sem precisar entender aprendizado de máquina.
 
-Entrada: de uma a cinco referências, escolhidas no autocomplete. É possível remover uma escolha antes de confirmar ou iniciar uma nova seleção.
+- Entrada: de uma a cinco referências, escolhidas no autocomplete. É possível remover uma escolha antes de confirmar ou iniciar uma nova seleção.
 
-Saída: até dez recomendações com justificativas. A comparação com os baselines de popularidade e nota ponderada pertence à avaliação experimental; o baseline de popularidade e o item–item experimental não geram as recomendações da página. Seleção de plataformas, consultas de disponibilidade e refinamento interativo foram definitivamente descontinuados no escopo final.
+- Saída: até dez recomendações com justificativas. A comparação com os baselines de popularidade e nota ponderada pertence à avaliação experimental; o baseline de popularidade e o item–item experimental não geram as recomendações da página. Seleção de plataformas, consultas de disponibilidade e refinamento interativo foram definitivamente descontinuados no escopo final.
 
 ### Direitos autorais e utilização
 
